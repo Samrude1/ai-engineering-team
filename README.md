@@ -55,10 +55,7 @@ graph TD
 3. **Environment Variables**:
    Create a `.env` file:
    ```env
-   OPENAI_API_KEY=sk-...
-   ANTHROPIC_API_KEY=sk-ant-...
-   # Optional: For OpenRouter support
-   OPENAI_API_BASE=https://openrouter.ai/api/v1
+   OPENROUTER_API_KEY=sk-or-v1-...
    ```
 4. **Run Web UI**:
    ```bash
@@ -72,7 +69,7 @@ graph TD
 This repository is configured with GitHub Actions to automatically sync to **Hugging Face Spaces**. 
 
 1. **GitHub Secret**: Add `HF_TOKEN` to your repository secrets.
-2. **Hugging Face Setup**: Add `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` to the Space's Secrets.
+2. **Hugging Face Setup**: Add `OPENROUTER_API_KEY` to the Space's Secrets.
 
 ---
 

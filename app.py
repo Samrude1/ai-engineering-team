@@ -6,6 +6,10 @@ from threading import Thread
 from engineering_team.crew import EngineeringTeam
 from engineering_team.utils import create_project_zip, cleanup_output
 
+# Rate Limiting Tracker
+IP_USAGE = {}
+MAX_REQUESTS_PER_IP = 15
+
 # CSS for the "Electric Blue" Premium Theme
 custom_css = """
 body, .gradio-container {
@@ -47,9 +51,26 @@ h1, h2, h3 {
 }
 """
 
-def solve_requirements(requirements, module_name, class_name):
+def solve_requirements(requirements, module_name, class_name, request: gr.Request):
+    # Simple IP-based Rate Limiter (anti-bot / anti-spam)
+    client_ip = request.client.host if request else "unknown"
+    
+    if client_ip not in IP_USAGE:
+        IP_USAGE[client_ip] = 0
+        
+    if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
+        yield f"⚠️ Rate limit exceeded for IP {client_ip}. Maximum {MAX_REQUESTS_PER_IP} test runs allowed to prevent spam.", "", "", "", "", gr.update(visible=False)
+        return
+        
+    # Input length protection to prevent token-bombing
+    if len(requirements) > 2000:
+        yield "⚠️ Requirements input too long. Please keep the description under 2000 characters.", "", "", "", "", gr.update(visible=False)
+        return
+
     # Prepare output directory
     cleanup_output('output')
+    
+    IP_USAGE[client_ip] += 1
     
     # Store inputs for the crew
     inputs = {
@@ -59,7 +80,7 @@ def solve_requirements(requirements, module_name, class_name):
     }
     
     # Status updates
-    yield "Initializing Engineering Team...", None, None, None, None, gr.update(visible=False)
+    yield f"Initializing Engineering Team... (Run {IP_USAGE[client_ip]}/{MAX_REQUESTS_PER_IP} for this IP)", None, None, None, None, gr.update(visible=False)
     
     # Run the crew
     try:
@@ -146,4 +167,5 @@ with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering 
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    # Queue is essential to handle traffic safely and limit concurrency
+    demo.queue(default_concurrency_limit=1, max_size=10).launch()
