@@ -15,6 +15,15 @@ from engineering_team.utils import create_project_zip, cleanup_output, sanitize_
 IP_USAGE = {}
 MAX_REQUESTS_PER_IP = 15
 
+# Task to Friendly Log Mapping - Short, interesting status updates
+TASK_LOG_MAP = {
+    "design_task": "🧠 Architecting the system blueprint...",
+    "code_task": "💻 Engineering core backend logic...",
+    "frontend_task": "📱 Building Gradio demonstration interface...",
+    "test_task": "🧪 Writing comprehensive unit tests...",
+    "documentation_task": "📖 Generating professional project documentation..."
+}
+
 # CSS for the "Electric Blue" Premium Theme
 custom_css = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
@@ -24,18 +33,52 @@ body, .gradio-container {
     color: #F8FAFC !important;
     font-family: 'Inter', -apple-system, sans-serif !important;
 }
-/* Ensure maximum contrast for all readable text */
-label, .label-wrap span, p, li, td, th, span {
+
+/* 1. Global High-Contrast Text Fixes */
+/* Targets all leipäteksti, markdown items, and labels */
+p, li, th, td, label, .markdown-text, .gr-form span {
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+/* Targets the subtitle specifically */
+.gradio-container .prose p, .gradio-container .prose span {
+    color: #E2E8F0 !important;
+}
+
+/* 2. Tab Menu Polishing */
+/* This ensures tab headers are clearly visible and professional */
+div.tabs button {
+    color: #94A3B8 !important;
+    font-weight: 500 !important;
+}
+div.tabs button.selected {
+    color: #60A5FA !important;
+    border-bottom: 2px solid #60A5FA !important;
+}
+div.tabs button:hover {
     color: #FFFFFF !important;
 }
+
+/* 3. Input & Terminal Styling */
 input, textarea, select {
     background-color: #161618 !important;
     border: 1px solid #1E40AF !important;
     color: #FFFFFF !important;
 }
 textarea::placeholder, input::placeholder {
-    color: #94A3B8 !important;
+    color: #64748B !important;
 }
+.terminal-box textarea {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+    background-color: #000000 !important;
+    border: 1px solid #1E40AF !important;
+    color: #4ADE80 !important;
+    white-space: pre-wrap !important;
+}
+
+/* 4. Primary Button Styling */
 button.primary {
     background: linear-gradient(90deg, #1E40AF 0%, #3B82F6 100%) !important;
     border: none !important;
@@ -52,18 +95,8 @@ button.secondary {
     border: 1px solid #374151 !important;
     color: #E2E8F0 !important;
 }
-button.secondary:hover {
-    border-color: #3B82F6 !important;
-    color: #FFFFFF !important;
-}
-.tab-nav button {
-    color: #CBD5E1 !important;
-    font-weight: 500 !important;
-}
-.tab-nav button.selected {
-    color: #60A5FA !important;
-    border-bottom: 2px solid #60A5FA !important;
-}
+
+/* Title Styling */
 h1 {
     color: #3B82F6 !important;
     font-size: 2.2rem !important;
@@ -75,14 +108,6 @@ h2, h3 {
     border-bottom: 1px solid #1E3A8A;
     padding-bottom: 5px;
 }
-.terminal-box textarea {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.85rem !important;
-    background-color: #000000 !important;
-    border: 1px solid #1E40AF !important;
-    color: #4ADE80 !important; /* Bright terminal green */
-    white-space: pre-wrap !important; /* Ensure long lines wrap */
-}
 """
 
 def solve_requirements_streaming(requirements, module_name, class_name, request: gr.Request):
@@ -93,12 +118,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
         yield ("⚠️ Rate limit reached (15 runs/IP).",
-               "", "", "", "", "", "System Error: Rate limit exceeded.", gr.update(visible=False))
+               "", "", "", "", "", "System Error: Rate limit reached.", gr.update(visible=False))
         return
         
     if len(requirements) > 2000:
         yield ("⚠️ Requirements too long.",
-               "", "", "", "", "", "System Error: Input exceeds 2000 chars.", gr.update(visible=False))
+               "", "", "", "", "", "System Error: Input too long.", gr.update(visible=False))
         return
 
     cleanup_output('output')
@@ -112,12 +137,21 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         description = task_output.description.lower()
         
         target_file = None
-        if "write a python module" in description:
+        current_task_type = None
+        
+        if "prepare a professional engineering blueprint" in description:
+            current_task_type = "design_task"
+        elif "write a python module" in description:
+            current_task_type = "code_task"
             target_file = os.path.join("output", module_name)
         elif "write a gradio ui" in description:
+            current_task_type = "frontend_task"
             target_file = os.path.join("output", "app.py")
         elif "write unit tests" in description:
+            current_task_type = "test_task"
             target_file = os.path.join("output", f"test_{module_name}")
+        elif "write a professional readme.md" in description:
+            current_task_type = "documentation_task"
 
         if target_file and task_output.pydantic:
             try:
@@ -129,8 +163,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
             except Exception as e:
                 msg = f"[{timestamp}] ⚠️ Error saving file: {str(e)}"
         else:
-            # Removed the character limit to show full descriptions
-            msg = f"[{timestamp}] ✅ Task Completed: {task_output.description}"
+            summary = TASK_LOG_MAP.get(current_task_type, f"Task Completed: {task_output.description[:50]}...")
+            msg = f"[{timestamp}] ✅ {summary}"
             
         log_queue.put(msg)
         
@@ -148,8 +182,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     }
     
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
-    # More descriptive initial status
-    yield ("🚀 Rocket Engineering Team is starting... (Takes 3-8 mins)", "", "", "", "", "", current_logs, gr.update(visible=False))
+    yield ("🚀 Rocket Engineering Team is starting... (Approx 3-8 mins)", "", "", "", "", "", current_logs, gr.update(visible=False))
     
     result_container = {"success": False, "data": None, "error": None, "done": False}
 
@@ -210,7 +243,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
 # Build UI
 with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering Team") as demo:
     gr.Markdown("# ⚡ AI Engineering Team")
-    gr.Markdown("**Full Software Development Automation** — View the real-time activity terminal below.")
+    # Subtitle contrast fix via Markdown structure
+    gr.Markdown("Full Software Development Automation — View the real-time activity terminal below.")
     
     with gr.Row():
         with gr.Column(scale=1):
