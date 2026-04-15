@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from engineering_team.crew import EngineeringTeam
-from engineering_team.utils import create_project_zip, cleanup_output, sanitize_all_outputs
+from engineering_team.utils import create_project_zip, cleanup_output, sanitize_all_outputs, strip_markdown_from_python
 
 # Rate Limiting Tracker
 IP_USAGE = {}
@@ -76,7 +76,7 @@ h2, h3 {
     font-size: 0.85rem !important;
     background-color: #000000 !important;
     border: 1px solid #1E40AF !important;
-    color: #00FF00 !important; /* Classic terminal green */
+    color: #00FF00 !important;
 }
 """
 
@@ -100,15 +100,39 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     IP_USAGE[client_ip] += 1
     
     log_queue = queue.Queue()
+    os.makedirs('output', exist_ok=True)
     
     def log_task(task_output):
         timestamp = datetime.now().strftime("%H:%M:%S")
-        msg = f"[{timestamp}] ✅ Task Completed: {task_output.description[:50]}..."
+        description = task_output.description.lower()
+        
+        # Determine the file path based on the task description
+        target_file = None
+        if "write a python module" in description:
+            target_file = os.path.join("output", module_name)
+        elif "write a gradio ui" in description:
+            target_file = os.path.join("output", "app.py")
+        elif "write unit tests" in description:
+            target_file = os.path.join("output", f"test_{module_name}")
+
+        # If it's a code task and we have Pydantic output, save the 'code' field
+        if target_file and task_output.pydantic:
+            try:
+                code = task_output.pydantic.code
+                with open(target_file, "w", encoding="utf-8") as f:
+                    f.write(code)
+                # Run the super-sanitizer just in case
+                strip_markdown_from_python(target_file)
+                msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
+            except Exception as e:
+                msg = f"[{timestamp}] ⚠️ Error saving file: {str(e)}"
+        else:
+            msg = f"[{timestamp}] ✅ Task Completed: {task_output.description[:50]}..."
+            
         log_queue.put(msg)
         
     def log_step(step_output):
         timestamp = datetime.now().strftime("%H:%M:%S")
-        # Extract agent name if possible or just show generic step
         msg = f"[{timestamp}] ⚙️ Agent thinking..."
         if hasattr(step_output, 'agent'):
              msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
@@ -123,7 +147,6 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
     yield ("🚀 Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
     
-    # Thread result storage
     result_container = {"success": False, "data": None, "error": None, "done": False}
 
     def run_crew():
@@ -139,23 +162,21 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     thread = threading.Thread(target=run_crew)
     thread.start()
 
-    # Stream logs to UI until finished
     while not result_container["done"]:
         try:
-            # Try to get all pending logs
             while True:
                 new_log = log_queue.get_nowait()
                 current_logs += new_log + "\n"
         except queue.Empty:
             pass
         
-        yield ("🚀 Team is working... (Check the Terminal below)", "", "", "", "", "", current_logs, gr.update(visible=False))
-        time.sleep(0.5)
+        yield ("🚀 Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
+        time.sleep(1)
 
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
         
-        # Post-process
+        # Post-process (Sanity check)
         sanitize_all_outputs('output', module_name)
         
         def read_file(path):
@@ -180,8 +201,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
             gr.update(value=zip_path, visible=True)
         )
     else:
-        error_msg = f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
-        current_logs += error_msg
+        current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred", "", "", "", "", "", current_logs, gr.update(visible=False))
 
 # Build UI
@@ -208,7 +228,6 @@ with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering 
             status = gr.Markdown("Ready.")
             download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
             
-            # THE TERMINAL
             terminal_log = gr.TextArea(
                 label="💠 Team Activity Terminal",
                 placeholder="Agent logs will appear here...",

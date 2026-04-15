@@ -6,42 +6,38 @@ from datetime import datetime
 
 def strip_markdown_from_python(file_path: str):
     """
-    Reads a Python file and aggressively removes ANY LLM formatting artifacts.
+    The SuperSanitizer: Its only purpose in the universe is to ensure
+    that a Python file contains ONLY Python code, stripped of all
+    LLM-generated artifacts, markdown fences, and conversational filler.
     """
     if not os.path.exists(file_path):
         return
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read().strip()
 
-    # Pass 1: Extract content between ```python and ``` or ``` and ```
+    # 1. Broad extraction: Find the largest block between backticks if they exist
     code_block_match = re.search(r'```(?:python)?\s*\n?([\s\S]*?)\n?```', content, re.IGNORECASE)
     if code_block_match:
         content = code_block_match.group(1).strip()
     
-    # Pass 2: Extreme Triple-Quote Wrapper stripping
-    # Sometimes LLMs wrap the whole file in """ ... """ or ''' ... '''
-    # We look for leading/trailing triple quotes that encompass the whole content.
-    # We use a non-greedy dotall match to check if it's one big outer block.
+    # 2. Triple-Quote Wrapper stripping (The 'Gemini Fix')
     wrapper_match = re.match(r'^\s*("""|\'\'\')\s*\n?([\s\S]*?)\n?\s*\1\s*$', content)
     if wrapper_match:
         content = wrapper_match.group(2).strip()
 
-    # Pass 3: Remove any leading/trailing single/double quotes (LLM "string" output)
-    if content.startswith('"') and content.endswith('"'):
-        content = content[1:-1].strip()
-    if content.startswith("'") and content.endswith("'"):
-        content = content[1:-1].strip()
+    # 3. Clean any remaining outer quotes or ticks
+    content = content.strip().strip('`').strip('"').strip("'").strip()
 
-    # Pass 4: "Find the Python" - discard anything before the first valid Python line
+    # 4. Entry Point Scan: Discard all preamble lines
     lines = content.split('\n')
     start_idx = 0
     found_start = False
     for i, line in enumerate(lines):
         clean_line = line.strip()
-        # Look for typical Python entry points
+        # Look for explicit Python markers
         if clean_line.startswith(('import ', 'from ', 'class ', 'def ', '#', '@', '"""', "'''")):
-            # Double check it's not a conversational filler
-            if not any(filler in clean_line.lower() for filler in ["here is", "surely", "certainly", "the code below", "this module"]):
+            # Ignore false positives like "Here is the class..."
+            if not any(filler in clean_line.lower() for filler in ["here is", "surely", "certainly", "the code below", "this module", "below is"]):
                 start_idx = i
                 found_start = True
                 break
@@ -49,8 +45,13 @@ def strip_markdown_from_python(file_path: str):
     if found_start:
         content = '\n'.join(lines[start_idx:])
 
+    # 5. Final pass: ensure no trailing markdown garbage
+    if content.endswith('```'):
+        content = content[:-3].strip()
+
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content.strip() + '\n')
+
 
 
 

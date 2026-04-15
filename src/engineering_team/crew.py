@@ -1,5 +1,11 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from pydantic import BaseModel, Field
+
+
+class CodeOutput(BaseModel):
+    code: str = Field(description="The full Python source code.")
+    description: str = Field(description="A brief description of what the code does.")
 
 
 
@@ -65,18 +71,21 @@ class EngineeringTeam():
     def code_task(self) -> Task:
         return Task(
             config=self.tasks_config['code_task'],
+            output_pydantic=CodeOutput
         )
 
     @task
     def frontend_task(self) -> Task:
         return Task(
             config=self.tasks_config['frontend_task'],
+            output_pydantic=CodeOutput
         )
 
     @task
     def test_task(self) -> Task:
         return Task(
             config=self.tasks_config['test_task'],
+            output_pydantic=CodeOutput
         )   
 
     @task

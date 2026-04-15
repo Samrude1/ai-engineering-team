@@ -1,74 +1,63 @@
 design_task:
   description: >
     Take the high level requirements and prepare a professional Engineering Blueprint.
-    The goal is to provide a clean, high-level overview for a software architect, not a granular method-by-method dump.
+    The goal is to provide a clean, high-level overview for a software architect.
     Your output should be a well-structured Markdown document with:
-    1. System Overview: What the solution does and its primary value.
-    2. Component Roadmap: A high-level list of the main classes/components to be built (no full code here).
-    3. Logic Flow: Briefly describe how the system handles the main requirement (the "Happy Path").
+    1. System Overview: What the solution does.
+    2. Component Roadmap: A high-level list of classes/components.
+    3. Logic Flow: Briefly describe how the system handles the main requirement.
     Requirements: {requirements}
     Keep it clean, concise, and professional.
   expected_output: >
-    A professional Engineering Blueprint in Markdown format providing a high-level system overview.
+    A professional Engineering Blueprint in Markdown format.
   agent: engineering_lead
   output_file: output/{module_name}_design.md
 
 code_task:
   description: >
-    Write a python module that implements the design described by the engineering lead, in order to achieve the requirements.
-    Here are the requirements: {requirements}
+    Write a python module that implements the design described by the engineering lead.
+    Requirements: {requirements}
+    IMPORTANT: You must output a JSON object with a 'code' field and a 'description' field.
+    The 'code' field should contain ONLY the raw Python code.
+    START the 'code' directly with the first line of code (import, class, etc.).
+    NO markdown formatting, no backticks, no preamble inside the 'code' field.
   expected_output: >
-    A python module that implements the design and achieves the requirements.
-    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code that can be directly saved to a file and executed.
+    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
   agent: backend_engineer
   context:
     - design_task
-  output_file: output/{module_name}
 
 frontend_task:
   description: >
-    Write a gradio UI in a module app.py that demonstrates the given backend class in {module_name}.
-    Assume there is only 1 user, and keep the UI very simple indeed - just a prototype or demo.
-    Here are the requirements: {requirements}
+    Write a gradio UI in a module app.py that demonstrates the given backend class.
+    Requirements: {requirements}
+    IMPORTANT: You must output a JSON object with a 'code' field and a 'description' field.
+    The 'code' field should contain ONLY the raw Python code.
+    START the 'code' directly with the first line of code (import, etc.).
   expected_output: >
-    A gradio UI in module app.py that demonstrates the given backend class.
-    The file should be ready so that it can be run as-is, in the same directory as the backend module, and it should import the backend class from {module_name}.
-    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code that can be directly saved to a file and executed.
+    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
   agent: frontend_engineer
   context:
     - code_task
-  output_file: output/app.py
 
 test_task:
   description: >
-    Write unit tests for the given backend module {module_name} and create a test_{module_name} in the same directory as the backend module.
+    Write unit tests for the given backend module {module_name}.
   expected_output: >
-    A test_{module_name} module that tests the given backend module.
-    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code that can be directly saved to a file and executed.
+    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
   agent: test_engineer
   context:
     - code_task
-  output_file: output/test_{module_name}
 
 documentation_task:
   description: >
-    Based on the finished Python module {module_name}, the Gradio app app.py, and the original requirements, write a professional and friendly README.md.
+    Based on the finished Python module {module_name}, the Gradio app app.py, and the original requirements, write a professional README.md.
     Requirements were: {requirements}
-    The README must include these sections:
-    1. A project title and one-sentence description
-    2. Key Features (bullet list of what the software does)
-    3. Project Structure (list the files and what each one does)
-    4. Local Setup & Installation (step-by-step: pip install gradio, python app.py)
-    5. How to Use (a short guide so that even a non-technical recruiter knows how to run the app and what to click)
-    6. Class Reference (a brief description of {class_name} and its main methods)
-    Write in clear, friendly English. Use markdown formatting.
+    Sections: Title, Features, Structure, Setup, How to Use, Class Reference.
   expected_output: >
-    A well-structured README.md file in markdown format covering all the sections described.
+    A well-structured README.md file in markdown format.
   agent: documentation_engineer
   context:
     - code_task
     - frontend_task
-  output_file: output/README.md
+  output_file: output/README.md
