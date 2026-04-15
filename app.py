@@ -165,7 +165,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         target_file = None
         current_task_type = None
         
-        if "engineering blueprint" in description: current_task_type = "design_task"
+        if "blueprint" in description: current_task_type = "design_task"
         elif "write a python module" in description:
             current_task_type = "code_task"
             target_file = os.path.join("output", module_name)
@@ -217,8 +217,13 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                 new_log = log_queue.get_nowait()
                 current_logs += new_log + "\n"
         except queue.Empty: pass
-        yield ("Engineering Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
-        time.sleep(1)
+        
+        # Determine the latest message to show in the main status Markdown
+        main_status = "Engineering Team is working..."
+        if "FinishedSuccessfully" in current_logs: main_status = "Finalizing output..."
+        
+        yield (main_status, "", "", "", "", "", current_logs, gr.update(visible=False))
+        time.sleep(0.5) # Faster polling for better UI responsiveness
 
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
