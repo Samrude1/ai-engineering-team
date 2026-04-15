@@ -6,23 +6,36 @@ from datetime import datetime
 
 def strip_markdown_from_python(file_path: str):
     """
-    Reads a Python file and removes any markdown code fences (```python ... ```)
-    that LLMs sometimes include in their output. Operates in-place.
+    Reads a Python file and aggressively removes any LLM formatting artifacts:
+    - Backtick code fences: ```python ... ```
+    - Triple-quote wrapper blocks: \"\"\" ... \"\"\" at the start of the file
+    Operates in-place.
     """
     if not os.path.exists(file_path):
         return
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Remove opening fence: ```python or ``` at the very start
+    # --- Pass 1: Remove backtick code fences ---
+    # Opening fence: ```python or ``` on its own line
     content = re.sub(r'^```(?:python)?\s*\n', '', content, flags=re.MULTILINE)
-    # Remove closing fence: ``` at the end
+    # Closing fence: ``` on its own line
     content = re.sub(r'\n```\s*$', '', content, flags=re.MULTILINE)
-    # Also catch any remaining stray ``` lines
+    # Any remaining stray ``` lines
     content = re.sub(r'^```\s*\n?', '', content, flags=re.MULTILINE)
+
+    # --- Pass 2: Remove leading triple-quote wrapper block ---
+    # LLMs sometimes wrap the entire output in """ ... """ instead of backticks.
+    # We only strip the FIRST such block if it appears before any real Python code.
+    # Pattern: file starts with """ (possibly with whitespace), then content, then closing """
+    content = re.sub(r'^\s*"""[\s\S]*?"""\s*\n?', '', content, count=1)
+    
+    # --- Pass 3: Remove any single-line LLM preamble comments like "Here is the code:" ---
+    content = re.sub(r'^(?:Here(?:\s+is)?[\s\S]*?:|Sure[,!][\s\S]*?:)\s*\n', '', content, flags=re.IGNORECASE)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content.strip() + '\n')
+
 
 
 def sanitize_all_outputs(output_dir: str, module_name: str):
