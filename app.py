@@ -149,6 +149,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
         yield ("⚠️ Rate limit reached.", "", "", "", "", "", "System Error: Rate limit.", gr.update(visible=False))
         return
+    
+    if not requirements.strip():
+        yield ("⚠️ Please enter your requirements.", "", "", "", "", "", "Input Error: Empty requirements.", gr.update(visible=False))
+        return
 
     cleanup_output('output')
     IP_USAGE[client_ip] += 1
@@ -257,10 +261,15 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                     btn_weather = gr.Button("🌦️ Weather", variant="secondary")
                     btn_trading = gr.Button("📈 Trading", variant="secondary")
                 
-                reqs = gr.TextArea(label="Requirements", placeholder="Describe your software...", lines=8)
+                reqs = gr.TextArea(
+                    label="Requirements", 
+                    placeholder="Describe your software...", 
+                    lines=8,
+                    value="A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing."
+                )
                 with gr.Row():
-                    mod_name = gr.Textbox(label="Module Name", placeholder="e.g. core.py")
-                    cls_name = gr.Textbox(label="Class Name", placeholder="e.g. MyManager")
+                    mod_name = gr.Textbox(label="Module Name", placeholder="e.g. core.py", value="investment.py")
+                    cls_name = gr.Textbox(label="Class Name", placeholder="e.g. MyManager", value="PortfolioManager")
                 
                 run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
