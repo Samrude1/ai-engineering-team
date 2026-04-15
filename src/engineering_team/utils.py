@@ -6,35 +6,55 @@ from datetime import datetime
 
 def strip_markdown_from_python(file_path: str):
     """
-    Reads a Python file and aggressively removes any LLM formatting artifacts:
-    - Backtick code fences: ```python ... ```
-    - Triple-quote wrapper blocks: \"\"\" ... \"\"\" at the start of the file
+    Reads a Python file and aggressively removes ANY LLM formatting artifacts:
+    - Backtick code fences (```python ... ```)
+    - Triple-quote wrappers (\"\"\" ... \"\"\")
+    - Leading text like "Here is the code..."
     Operates in-place.
     """
     if not os.path.exists(file_path):
         return
     with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+        content = f.read().strip()
 
-    # --- Pass 1: Remove backtick code fences ---
-    # Opening fence: ```python or ``` on its own line
-    content = re.sub(r'^```(?:python)?\s*\n', '', content, flags=re.MULTILINE)
-    # Closing fence: ``` on its own line
-    content = re.sub(r'\n```\s*$', '', content, flags=re.MULTILINE)
-    # Any remaining stray ``` lines
-    content = re.sub(r'^```\s*\n?', '', content, flags=re.MULTILINE)
-
-    # --- Pass 2: Remove leading triple-quote wrapper block ---
-    # LLMs sometimes wrap the entire output in """ ... """ instead of backticks.
-    # We only strip the FIRST such block if it appears before any real Python code.
-    # Pattern: file starts with """ (possibly with whitespace), then content, then closing """
-    content = re.sub(r'^\s*"""[\s\S]*?"""\s*\n?', '', content, count=1)
+    # Pass 1: Extract content between ```python and ``` or ``` and ```
+    # This is the most common LLM artifact.
+    code_block_match = re.search(r'```(?:python)?\s*\n?([\s\S]*?)\n?```', content, re.IGNORECASE)
+    if code_block_match:
+        content = code_block_match.group(1).strip()
     
-    # --- Pass 3: Remove any single-line LLM preamble comments like "Here is the code:" ---
-    content = re.sub(r'^(?:Here(?:\s+is)?[\s\S]*?:|Sure[,!][\s\S]*?:)\s*\n', '', content, flags=re.IGNORECASE)
+    # Pass 2: If starting/ending with triple quotes, it's likely a wrapper
+    if (content.startswith('"""') and content.endswith('"""')) or \
+       (content.startswith("'''") and content.endswith("'''")):
+        # We only strip if it looks like a wrapper (too long to be a normal comment)
+        # or if it encapsulates the whole content.
+        content = content[3:-3].strip()
+
+    # Pass 3: Remove any leading double-quotes (sometimes LLMs start with "class ...)
+    if content.startswith('"') and content.endswith('"'):
+        content = content[1:-1].strip()
+
+    # Pass 4: "Find the Python" - discard anything before the first valid Python line
+    # (import, class, def, #, from, @decor, or a docstring if it's correct)
+    lines = content.split('\n')
+    start_idx = 0
+    found_start = False
+    for i, line in enumerate(lines):
+        clean_line = line.strip()
+        # Look for typical Python entry points
+        if clean_line.startswith(('import ', 'from ', 'class ', 'def ', '#', '@', '"""', "'''")):
+            # Double check it's not a conversational filler like "Here is the class..."
+            if not any(filler in clean_line.lower() for filler in ["here is", "surely", "certainly", "the code below"]):
+                start_idx = i
+                found_start = True
+                break
+    
+    if found_start:
+        content = '\n'.join(lines[start_idx:])
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content.strip() + '\n')
+
 
 
 
