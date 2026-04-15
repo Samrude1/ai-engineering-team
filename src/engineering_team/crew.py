@@ -23,7 +23,7 @@ class EngineeringTeam():
             config=self.agents_config['backend_engineer'],
             verbose=True,
             allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
+            code_execution_mode="unsafe",  # Changed to 'unsafe' because HF Spaces are already isolated and lack Docker-in-Docker
             max_execution_time=500, 
             max_retry_limit=3 
         )
@@ -41,7 +41,7 @@ class EngineeringTeam():
             config=self.agents_config['test_engineer'],
             verbose=True,
             allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
+            code_execution_mode="unsafe",  # Changed to 'unsafe' because HF Spaces are already isolated and lack Docker-in-Docker
             max_execution_time=500, 
             max_retry_limit=3 
         )
