@@ -21,19 +21,20 @@ custom_css = """
 
 body, .gradio-container {
     background-color: #0A0A0B !important;
-    color: #F0F0F0 !important;
+    color: #F8FAFC !important;
     font-family: 'Inter', -apple-system, sans-serif !important;
 }
-label, .label-wrap span, p, li, td, th {
-    color: #D0D8E8 !important;
+/* Ensure maximum contrast for all readable text */
+label, .label-wrap span, p, li, td, th, span {
+    color: #FFFFFF !important;
 }
 input, textarea, select {
     background-color: #161618 !important;
     border: 1px solid #1E40AF !important;
-    color: #F0F0F0 !important;
+    color: #FFFFFF !important;
 }
 textarea::placeholder, input::placeholder {
-    color: #6B7280 !important;
+    color: #94A3B8 !important;
 }
 button.primary {
     background: linear-gradient(90deg, #1E40AF 0%, #3B82F6 100%) !important;
@@ -49,34 +50,38 @@ button.primary:hover {
 button.secondary {
     background: #1C1C1E !important;
     border: 1px solid #374151 !important;
-    color: #D1D5DB !important;
+    color: #E2E8F0 !important;
 }
 button.secondary:hover {
     border-color: #3B82F6 !important;
-    color: #F0F0F0 !important;
+    color: #FFFFFF !important;
 }
 .tab-nav button {
-    color: #9CA3AF !important;
+    color: #CBD5E1 !important;
+    font-weight: 500 !important;
 }
 .tab-nav button.selected {
-    color: #3B82F6 !important;
-    border-bottom: 2px solid #3B82F6 !important;
+    color: #60A5FA !important;
+    border-bottom: 2px solid #60A5FA !important;
 }
 h1 {
     color: #3B82F6 !important;
-    font-size: 2rem !important;
+    font-size: 2.2rem !important;
     font-weight: 700 !important;
-    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 h2, h3 {
     color: #60A5FA !important;
+    border-bottom: 1px solid #1E3A8A;
+    padding-bottom: 5px;
 }
 .terminal-box textarea {
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 0.85rem !important;
     background-color: #000000 !important;
     border: 1px solid #1E40AF !important;
-    color: #00FF00 !important;
+    color: #4ADE80 !important; /* Bright terminal green */
+    white-space: pre-wrap !important; /* Ensure long lines wrap */
 }
 """
 
@@ -87,13 +92,13 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         IP_USAGE[client_ip] = 0
         
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
-        yield (f"⚠️ Rate limit reached ({MAX_REQUESTS_PER_IP} runs/IP).",
-               "", "", "", "", "", "System Error: Rate limit exceeded for this IP.", gr.update(visible=False))
+        yield ("⚠️ Rate limit reached (15 runs/IP).",
+               "", "", "", "", "", "System Error: Rate limit exceeded.", gr.update(visible=False))
         return
         
     if len(requirements) > 2000:
         yield ("⚠️ Requirements too long.",
-               "", "", "", "", "", "System Error: Input too long.", gr.update(visible=False))
+               "", "", "", "", "", "System Error: Input exceeds 2000 chars.", gr.update(visible=False))
         return
 
     cleanup_output('output')
@@ -106,7 +111,6 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         timestamp = datetime.now().strftime("%H:%M:%S")
         description = task_output.description.lower()
         
-        # Determine the file path based on the task description
         target_file = None
         if "write a python module" in description:
             target_file = os.path.join("output", module_name)
@@ -115,19 +119,18 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         elif "write unit tests" in description:
             target_file = os.path.join("output", f"test_{module_name}")
 
-        # If it's a code task and we have Pydantic output, save the 'code' field
         if target_file and task_output.pydantic:
             try:
                 code = task_output.pydantic.code
                 with open(target_file, "w", encoding="utf-8") as f:
                     f.write(code)
-                # Run the super-sanitizer just in case
                 strip_markdown_from_python(target_file)
                 msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
             except Exception as e:
                 msg = f"[{timestamp}] ⚠️ Error saving file: {str(e)}"
         else:
-            msg = f"[{timestamp}] ✅ Task Completed: {task_output.description[:50]}..."
+            # Removed the character limit to show full descriptions
+            msg = f"[{timestamp}] ✅ Task Completed: {task_output.description}"
             
         log_queue.put(msg)
         
@@ -145,7 +148,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     }
     
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
-    yield ("🚀 Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
+    # More descriptive initial status
+    yield ("🚀 Rocket Engineering Team is starting... (Takes 3-8 mins)", "", "", "", "", "", current_logs, gr.update(visible=False))
     
     result_container = {"success": False, "data": None, "error": None, "done": False}
 
@@ -170,13 +174,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         except queue.Empty:
             pass
         
-        yield ("🚀 Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
+        yield ("🚀 Rocket Engineering Team is working... (Approx 3-8 mins)", "", "", "", "", "", current_logs, gr.update(visible=False))
         time.sleep(1)
 
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
         
-        # Post-process (Sanity check)
         sanitize_all_outputs('output', module_name)
         
         def read_file(path):
@@ -191,7 +194,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         zip_path = create_project_zip('output', zip_name_prefix=module_name.split('.')[0])
         
         yield (
-            "✅ Done!",
+            "✅ All projects generated! Download your ZIP below.",
             design_content,
             code_content,
             app_content,
@@ -202,7 +205,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         )
     else:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
-        yield ("❌ Error occurred", "", "", "", "", "", current_logs, gr.update(visible=False))
+        yield ("❌ Error occurred during engineering process.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering Team") as demo:
@@ -225,13 +228,13 @@ with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering 
                 run_btn   = gr.Button("🚀 KICKOFF TEAM", variant="primary", scale=3)
                 reset_btn = gr.Button("🔄 Reset", variant="secondary", scale=1)
             
-            status = gr.Markdown("Ready.")
+            status = gr.Markdown("Ready to engineer.")
             download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
             
             terminal_log = gr.TextArea(
                 label="💠 Team Activity Terminal",
                 placeholder="Agent logs will appear here...",
-                lines=12,
+                lines=15,
                 interactive=False,
                 elem_classes=["terminal-box"]
             )
