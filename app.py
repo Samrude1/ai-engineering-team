@@ -3,6 +3,10 @@ import os
 import shutil
 import time
 from threading import Thread
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
+
 from engineering_team.crew import EngineeringTeam
 from engineering_team.utils import create_project_zip, cleanup_output
 
