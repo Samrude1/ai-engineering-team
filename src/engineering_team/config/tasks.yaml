@@ -48,3 +48,23 @@ test_task:
   context:
     - code_task
   output_file: output/test_{module_name}
+
+documentation_task:
+  description: >
+    Based on the finished Python module {module_name}, the Gradio app app.py, and the original requirements, write a professional and friendly README.md.
+    Requirements were: {requirements}
+    The README must include these sections:
+    1. A project title and one-sentence description
+    2. Key Features (bullet list of what the software does)
+    3. Project Structure (list the files and what each one does)
+    4. Local Setup & Installation (step-by-step: pip install gradio, python app.py)
+    5. How to Use (a short guide so that even a non-technical recruiter knows how to run the app and what to click)
+    6. Class Reference (a brief description of {class_name} and its main methods)
+    Write in clear, friendly English. Use markdown formatting.
+  expected_output: >
+    A well-structured README.md file in markdown format covering all the sections described.
+  agent: documentation_engineer
+  context:
+    - code_task
+    - frontend_task
+  output_file: output/README.md
