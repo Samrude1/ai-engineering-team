@@ -35,8 +35,10 @@ body, .gradio-container {
 }
 
 .gradio-container {
-    max-width: 1050px !important;
+    max-width: 1200px !important;
     margin: 0 auto !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
 }
 
 /* Typography */
@@ -72,6 +74,7 @@ input, textarea {
     font-size: 0.95rem !important;
     transition: all 0.2s ease !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    padding: 10px !important;
 }
 
 input:focus, textarea:focus {
@@ -140,6 +143,17 @@ div.tabs button.selected {
     color: #111111 !important;
     border-bottom: 2px solid #111111 !important;
     background: transparent !important;
+}
+
+/* Fix for right-side data cutoff */
+.tabitem {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+    overflow-x: auto !important;
 }
 """
 
@@ -218,12 +232,11 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                 current_logs += new_log + "\n"
         except queue.Empty: pass
         
-        # Determine the latest message to show in the main status Markdown
         main_status = "Engineering Team is working..."
         if "FinishedSuccessfully" in current_logs: main_status = "Finalizing output..."
         
         yield (main_status, "", "", "", "", "", current_logs, gr.update(visible=False))
-        time.sleep(0.5) # Faster polling for better UI responsiveness
+        time.sleep(0.5)
 
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
@@ -249,7 +262,7 @@ def set_weather(): return "A weather dashboard that integrates with a mock API. 
 def set_trading(): return "A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing.", "investment.py", "PortfolioManager"
 
 # Build UI
-with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team") as demo:
+with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
     with gr.Row():
         with gr.Column(scale=8):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
@@ -258,7 +271,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
             reset_btn = gr.Button("Reset session", variant="secondary")
 
     with gr.Row():
-        with gr.Column(scale=1):
+        with gr.Column(scale=3, min_width=300): # Fixed width for inputs to ensure right column gets space
             with gr.Group():
                 gr.Markdown("<p style='font-size: 0.9em; color: #666; margin-bottom: 5px; padding-left: 5px;'><i>Quick Scenarios</i></p>")
                 with gr.Row():
@@ -288,18 +301,18 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                     lines=12, interactive=False, elem_classes=["terminal-box"]
                 )
             
-        with gr.Column(scale=2):
+        with gr.Column(scale=7): # Larger scale for output content
             with gr.Tabs():
                 with gr.TabItem("📋 Architecture"):
-                    design_out = gr.Markdown("Waiting...")
+                    design_out = gr.Markdown("Waiting...", elem_classes=["tabitem"])
                 with gr.TabItem("🐍 Backend"):
-                    code_out = gr.Code(language="python")
+                    code_out = gr.Code(language="python", elem_classes=["tabitem"])
                 with gr.TabItem("🖥️ Gradio UI"):
-                    app_out = gr.Code(language="python")
+                    app_out = gr.Code(language="python", elem_classes=["tabitem"])
                 with gr.TabItem("🧪 Tests"):
-                    test_out = gr.Code(language="python")
+                    test_out = gr.Code(language="python", elem_classes=["tabitem"])
                 with gr.TabItem("📖 README"):
-                    readme_out = gr.Markdown("Waiting...")
+                    readme_out = gr.Markdown("Waiting...", elem_classes=["tabitem"])
 
     # Wire buttons
     btn_bank.click(set_banking, [], [reqs, mod_name, cls_name])
