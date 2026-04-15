@@ -24,123 +24,122 @@ TASK_LOG_MAP = {
     "documentation_task": "📖 Generating professional project documentation..."
 }
 
-# CSS for the "Enterprise Edition" Slate & Azure Theme
+# Custom CSS for the Professional Minimalist 'Zinc' Theme (Matching Sidekick)
 custom_css = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 body, .gradio-container {
-    background-color: #0F172A !important; /* Slate 900 */
-    color: #F8FAFC !important;
     font-family: 'Inter', -apple-system, sans-serif !important;
+    background-color: #fdfdfd !important;
+    color: #1a1a1a !important;
 }
 
 .gradio-container {
-    max-width: 1200px !important;
+    max-width: 1050px !important;
     margin: 0 auto !important;
-    padding-top: 2rem !important;
-}
-
-/* Card-style Grouping */
-.group-card {
-    background: #1E293B !important; /* Slate 800 */
-    border: 1px solid #334155 !important;
-    border-radius: 12px !important;
-    padding: 20px !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
-    margin-bottom: 20px !important;
 }
 
 /* Typography */
 h1 {
-    color: #38BDF8 !important; /* Sky 400 */
-    font-size: 2.5rem !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
-    letter-spacing: -0.025em !important;
-    margin-bottom: 0.5rem !important;
+    color: #111111 !important;
+    letter-spacing: -0.03em !important;
+    margin-bottom: 0.2rem !important;
+    font-size: 2.2rem !important;
 }
 
-p, li, th, td, label {
-    color: #E2E8F0 !important;
+h2, h3 {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    letter-spacing: -0.02em !important;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem !important;
+}
+
+p, li, th, td, label, span {
+    color: #374151 !important; /* Slate 700 */
 }
 
 /* Inputs */
-input, textarea, select {
-    background-color: #0F172A !important;
-    border: 1px solid #334155 !important;
-    border-radius: 8px !important;
-    color: #F8FAFC !important;
+input, textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #d4d4d4 !important;
+    border-radius: 6px !important;
+    color: #111111 !important;
     font-size: 0.95rem !important;
-    padding: 12px !important;
     transition: all 0.2s ease !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
 }
 
 input:focus, textarea:focus {
-    border-color: #38BDF8 !important;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+    border-color: #111111 !important;
+    box-shadow: 0 0 0 1px #111111 !important;
     outline: none !important;
 }
 
-/* Action Buttons */
+/* Buttons */
 button.primary {
-    background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
-    border: none !important;
-    color: #FFFFFF !important;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
-    padding: 12px 24px !important;
-    transition: all 0.3s ease !important;
-}
-
-button.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4) !important;
-}
-
-button.secondary {
-    background: #334155 !important;
-    border: 1px solid #475569 !important;
-    color: #F8FAFC !important;
-    border-radius: 8px !important;
-}
-
-button.secondary:hover {
-    background: #475569 !important;
-}
-
-/* PresetsRow Styling */
-.preset-btn {
-    font-size: 0.85rem !important;
-    padding: 8px 12px !important;
-    min-width: 140px !important;
-}
-
-/* Terminal Styling */
-.terminal-box textarea {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.85rem !important;
-    background-color: #020617 !important;
-    border: 1px solid #0EA5E9 !important;
-    color: #38BDF8 !important;
-    white-space: pre-wrap !important;
-    border-radius: 10px !important;
-}
-
-/* Tabs Styling */
-div.tabs {
-    background: transparent !important;
-    border: none !important;
-}
-
-div.tabs button {
-    color: #94A3B8 !important;
+    background: #111111 !important;
+    color: #ffffff !important;
+    border: 1px solid #111111 !important;
+    border-radius: 6px !important;
     font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.2s ease !important;
     padding: 10px 20px !important;
 }
 
+button.primary:hover {
+    background: #2a2a2a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+button.secondary {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid #d4d4d4 !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+}
+
+button.secondary:hover {
+    background: #f9fafb !important;
+    border-color: #111111 !important;
+}
+
+/* Terminal & Logs */
+.terminal-box textarea {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+    white-space: pre-wrap !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+/* Tabs */
+div.tabs {
+    border: none !important;
+    background: transparent !important;
+}
+
+div.tabs button {
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    border-bottom: 2px solid transparent !important;
+}
+
 div.tabs button.selected {
-    color: #38BDF8 !important;
-    border-bottom: 3px solid #38BDF8 !important;
-    background: rgba(56, 189, 248, 0.05) !important;
+    color: #111111 !important;
+    border-bottom: 2px solid #111111 !important;
+    background: transparent !important;
 }
 """
 
@@ -148,7 +147,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     client_ip = request.client.host if request else "unknown"
     if client_ip not in IP_USAGE: IP_USAGE[client_ip] = 0
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
-        yield ("⚠️ Rate limit reached.", "", "", "", "", "", "System Error: Rate limit reached.", gr.update(visible=False))
+        yield ("⚠️ Rate limit reached.", "", "", "", "", "", "System Error: Rate limit.", gr.update(visible=False))
         return
 
     cleanup_output('output')
@@ -193,8 +192,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         log_queue.put(msg)
 
     inputs = {'requirements': requirements, 'module_name': module_name, 'class_name': class_name}
-    current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Enterprise Engineering Team...\n"
-    yield ("🚀 Team is starting... (Approx 3-8 mins)", "", "", "", "", "", current_logs, gr.update(visible=False))
+    current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
+    yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
     
     result_container = {"success": False, "data": None, "error": None, "done": False}
     def run_crew():
@@ -214,7 +213,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                 new_log = log_queue.get_nowait()
                 current_logs += new_log + "\n"
         except queue.Empty: pass
-        yield ("🚀 Rocket Engineering Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
+        yield ("Engineering Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
         time.sleep(1)
 
     if result_container["success"]:
@@ -223,7 +222,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         def read_file(path): return open(path, 'r', encoding='utf-8').read() if os.path.exists(path) else ""
         zip_path = create_project_zip('output', zip_name_prefix=module_name.split('.')[0])
         yield (
-            "✅ Project Generated! Download below.",
+            "✅ All projects generated!",
             read_file(f"output/{module_name}_design.md"),
             read_file(f"output/{module_name}"),
             read_file("output/app.py"),
@@ -236,44 +235,41 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
-def set_preset(choice):
-    presets = {
-        "🏦 Banking System": ("A secure personal banking system with accounts, transfers, and transaction history. Needs to handle negative balances and basic fraud checks.", "banking.py", "Bank"),
-        "🌦️ Weather Dashboard": ("A weather dashboard that integrates with a mock API. Users can search for cities and see a 5-day forecast. Use Gradio for the UI.", "weather_app.py", "WeatherSystem"),
-        "📈 Trading Platform": ("A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing.", "investment.py", "PortfolioManager")
-    }
-    return presets[choice]
+def set_banking(): return "A secure personal banking system with accounts, transfers, and transaction history. Needs to handle negative balances and basic fraud checks.", "banking.py", "Bank"
+def set_weather(): return "A weather dashboard that integrates with a mock API. Users can search for cities and see a 5-day forecast. Use Gradio for the UI.", "weather_app.py", "WeatherSystem"
+def set_trading(): return "A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing.", "investment.py", "PortfolioManager"
 
 # Build UI
-with gr.Blocks(theme=gr.themes.Base(primary_hue="sky", neutral_hue="slate"), css=custom_css, title="Engineering Team | Enterprise") as demo:
+with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team") as demo:
     with gr.Row():
-        with gr.Column(scale=9):
+        with gr.Column(scale=8):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
             gr.Markdown("*Full Software Development Automation for the Modern Enterprise.*")
-        with gr.Column(scale=1):
-            reset_btn = gr.Button("🔄 Reset", variant="secondary")
+        with gr.Column(scale=2, min_width=100):
+            reset_btn = gr.Button("Reset session", variant="secondary")
 
     with gr.Row():
         with gr.Column(scale=1):
-            with gr.Group(elem_classes=["group-card"]):
-                gr.Markdown("### 🏢 Project Gallery")
-                preset_options = ["🏦 Banking System", "🌦️ Weather Dashboard", "📈 Trading Platform"]
-                preset_radio = gr.Radio(preset_options, label="Select a scenario to pre-fill", value=None)
+            with gr.Group():
+                gr.Markdown("<p style='font-size: 0.9em; color: #666; margin-bottom: 5px; padding-left: 5px;'><i>Quick Scenarios</i></p>")
+                with gr.Row():
+                    btn_bank = gr.Button("🏦 Banking", variant="secondary")
+                    btn_weather = gr.Button("🌦️ Weather", variant="secondary")
+                    btn_trading = gr.Button("📈 Trading", variant="secondary")
                 
-                gr.Markdown("---")
                 reqs = gr.TextArea(label="Requirements", placeholder="Describe your software...", lines=8)
                 with gr.Row():
                     mod_name = gr.Textbox(label="Module Name", placeholder="e.g. core.py")
                     cls_name = gr.Textbox(label="Class Name", placeholder="e.g. MyManager")
                 
-                run_btn = gr.Button("🚀 KICKOFF TEAM", variant="primary")
+                run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
             status = gr.Markdown("Ready to engineer.")
             download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
             
-            with gr.Group(elem_classes=["group-card"]):
+            with gr.Group():
                 terminal_log = gr.TextArea(
-                    label="💠 Mission Control Terminal",
+                    label="Engineering Logs",
                     placeholder="Team activity logs...",
                     lines=12, interactive=False, elem_classes=["terminal-box"]
                 )
@@ -281,7 +277,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="sky", neutral_hue="slate"), css
         with gr.Column(scale=2):
             with gr.Tabs():
                 with gr.TabItem("📋 Architecture"):
-                    design_out = gr.Markdown("Awaits blueprinting...")
+                    design_out = gr.Markdown("Waiting...")
                 with gr.TabItem("🐍 Backend"):
                     code_out = gr.Code(language="python")
                 with gr.TabItem("🖥️ Gradio UI"):
@@ -289,9 +285,12 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="sky", neutral_hue="slate"), css
                 with gr.TabItem("🧪 Tests"):
                     test_out = gr.Code(language="python")
                 with gr.TabItem("📖 README"):
-                    readme_out = gr.Markdown("Awaits generation...")
+                    readme_out = gr.Markdown("Waiting...")
 
-    preset_radio.change(set_preset, inputs=[preset_radio], outputs=[reqs, mod_name, cls_name])
+    # Wire buttons
+    btn_bank.click(set_banking, [], [reqs, mod_name, cls_name])
+    btn_weather.click(set_weather, [], [reqs, mod_name, cls_name])
+    btn_trading.click(set_trading, [], [reqs, mod_name, cls_name])
     
     run_btn.click(
         fn=solve_requirements_streaming,
