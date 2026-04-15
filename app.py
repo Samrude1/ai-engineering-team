@@ -1,7 +1,10 @@
 import gradio as gr
 import os
 import sys
-from threading import Thread
+import threading
+import queue
+import time
+from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
@@ -14,7 +17,7 @@ MAX_REQUESTS_PER_IP = 15
 
 # CSS for the "Electric Blue" Premium Theme
 custom_css = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
 
 body, .gradio-container {
     background-color: #0A0A0B !important;
@@ -68,51 +71,93 @@ h1 {
 h2, h3 {
     color: #60A5FA !important;
 }
-.markdown-body, .prose {
-    color: #D0D8E8 !important;
-}
-.footer {
-    color: #6B7280 !important;
+.terminal-box textarea {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+    background-color: #000000 !important;
+    border: 1px solid #1E40AF !important;
+    color: #00FF00 !important; /* Classic terminal green */
 }
 """
 
-def solve_requirements(requirements, module_name, class_name, request: gr.Request):
-    # Simple IP-based Rate Limiter (anti-bot / anti-spam)
+def solve_requirements_streaming(requirements, module_name, class_name, request: gr.Request):
     client_ip = request.client.host if request else "unknown"
     
     if client_ip not in IP_USAGE:
         IP_USAGE[client_ip] = 0
         
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
-        yield (f"⚠️ Rate limit reached ({MAX_REQUESTS_PER_IP} runs/IP). Please try again later.",
-               "", "", "", "", "", gr.update(visible=False))
+        yield (f"⚠️ Rate limit reached ({MAX_REQUESTS_PER_IP} runs/IP).",
+               "", "", "", "", "", "System Error: Rate limit exceeded for this IP.", gr.update(visible=False))
         return
         
-    # Input length protection to prevent token-bombing
     if len(requirements) > 2000:
-        yield ("⚠️ Requirements too long. Please keep under 2000 characters.",
-               "", "", "", "", "", gr.update(visible=False))
+        yield ("⚠️ Requirements too long.",
+               "", "", "", "", "", "System Error: Input too long.", gr.update(visible=False))
         return
 
     cleanup_output('output')
     IP_USAGE[client_ip] += 1
     
+    log_queue = queue.Queue()
+    
+    def log_task(task_output):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        msg = f"[{timestamp}] ✅ Task Completed: {task_output.description[:50]}..."
+        log_queue.put(msg)
+        
+    def log_step(step_output):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        # Extract agent name if possible or just show generic step
+        msg = f"[{timestamp}] ⚙️ Agent thinking..."
+        if hasattr(step_output, 'agent'):
+             msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
+        log_queue.put(msg)
+
     inputs = {
         'requirements': requirements,
         'module_name': module_name,
         'class_name': class_name
     }
     
-    yield (f"🚀 Engineering Team is working... (Run {IP_USAGE[client_ip]}/{MAX_REQUESTS_PER_IP}). This takes 3–8 minutes — please wait.",
-           "", "", "", "", "", gr.update(visible=False))
+    current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
+    yield ("🚀 Team is working...", "", "", "", "", "", current_logs, gr.update(visible=False))
     
-    try:
-        result = EngineeringTeam().crew().kickoff(inputs=inputs)
+    # Thread result storage
+    result_container = {"success": False, "data": None, "error": None, "done": False}
+
+    def run_crew():
+        try:
+            crew_obj = EngineeringTeam(task_callback=log_task, step_callback=log_step).crew()
+            result_container["data"] = crew_obj.kickoff(inputs=inputs)
+            result_container["success"] = True
+        except Exception as e:
+            result_container["error"] = str(e)
+        finally:
+            result_container["done"] = True
+
+    thread = threading.Thread(target=run_crew)
+    thread.start()
+
+    # Stream logs to UI until finished
+    while not result_container["done"]:
+        try:
+            # Try to get all pending logs
+            while True:
+                new_log = log_queue.get_nowait()
+                current_logs += new_log + "\n"
+        except queue.Empty:
+            pass
         
-        # Post-process: strip any LLM markdown artifacts (backticks) from Python files
+        yield ("🚀 Team is working... (Check the Terminal below)", "", "", "", "", "", current_logs, gr.update(visible=False))
+        time.sleep(0.5)
+
+    if result_container["success"]:
+        current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
+        
+        # Post-process
         sanitize_all_outputs('output', module_name)
         
-        # Read generated files
         def read_file(path):
             return open(path, 'r', encoding='utf-8').read() if os.path.exists(path) else ""
         
@@ -122,33 +167,35 @@ def solve_requirements(requirements, module_name, class_name, request: gr.Reques
         test_content   = read_file(f"output/test_{module_name}")
         readme_content = read_file("output/README.md")
                 
-        # Create ZIP for download
         zip_path = create_project_zip('output', zip_name_prefix=module_name.split('.')[0])
         
         yield (
-            "✅ Done! Your project is ready. Download the ZIP or explore the tabs below.",
+            "✅ Done!",
             design_content,
             code_content,
             app_content,
             test_content,
             readme_content,
+            current_logs,
             gr.update(value=zip_path, visible=True)
         )
-    except Exception as e:
-        yield f"❌ Error occurred: {str(e)}", "", "", "", "", "", gr.update(visible=False)
+    else:
+        error_msg = f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
+        current_logs += error_msg
+        yield ("❌ Error occurred", "", "", "", "", "", current_logs, gr.update(visible=False))
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering Team") as demo:
     gr.Markdown("# ⚡ AI Engineering Team")
-    gr.Markdown("**Full Software Development Automation** — From Requirements to Design, Code, UI, Tests, and Documentation.")
+    gr.Markdown("**Full Software Development Automation** — View the real-time activity terminal below.")
     
     with gr.Row():
         with gr.Column(scale=1):
             reqs = gr.TextArea(
                 label="Requirements", 
-                placeholder="Describe the software you want the team to build...",
-                lines=10,
-                value="A simple account management system for a trading simulation platform.\nThe system should allow users to create an account, deposit funds, and withdraw funds.\nThe system should allow users to record that they have bought or sold shares, providing a quantity."
+                placeholder="Describe the software you want building...",
+                lines=8,
+                value="A simple account management system for a trading simulation platform.\nThe system should allow users to create an account, deposit funds, and withdraw funds."
             )
             with gr.Row():
                 mod_name = gr.Textbox(label="Module Name", value="accounts.py")
@@ -158,13 +205,22 @@ with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering 
                 run_btn   = gr.Button("🚀 KICKOFF TEAM", variant="primary", scale=3)
                 reset_btn = gr.Button("🔄 Reset", variant="secondary", scale=1)
             
-            status = gr.Markdown("Ready to build. Enter requirements and click **KICKOFF TEAM**.")
-            download_btn = gr.File(label="⬇️ Download Generated Project (ZIP)", visible=False)
+            status = gr.Markdown("Ready.")
+            download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
+            
+            # THE TERMINAL
+            terminal_log = gr.TextArea(
+                label="💠 Team Activity Terminal",
+                placeholder="Agent logs will appear here...",
+                lines=12,
+                interactive=False,
+                elem_classes=["terminal-box"]
+            )
             
         with gr.Column(scale=2):
             with gr.Tabs():
                 with gr.TabItem("📋 Architecture Design"):
-                    design_out = gr.Markdown("Waiting for kickoff...")
+                    design_out = gr.Markdown("Waiting...")
                 with gr.TabItem("🐍 Backend Code"):
                     code_out = gr.Code(language="python")
                 with gr.TabItem("🖥️ Gradio App"):
@@ -172,15 +228,14 @@ with gr.Blocks(theme=gr.themes.Default(), css=custom_css, title="AI Engineering 
                 with gr.TabItem("🧪 Unit Tests"):
                     test_out = gr.Code(language="python")
                 with gr.TabItem("📖 Project README"):
-                    readme_out = gr.Markdown("The documentation engineer will generate a README here after the run...")
+                    readme_out = gr.Markdown("Waiting...")
 
     run_btn.click(
-        fn=solve_requirements,
+        fn=solve_requirements_streaming,
         inputs=[reqs, mod_name, cls_name],
-        outputs=[status, design_out, code_out, app_out, test_out, readme_out, download_btn]
+        outputs=[status, design_out, code_out, app_out, test_out, readme_out, terminal_log, download_btn]
     )
     
-    # Reset button: simply refreshes the page
     reset_btn.click(fn=None, js="() => { window.location.reload(); }")
 
 if __name__ == "__main__":

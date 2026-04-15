@@ -10,6 +10,10 @@ class EngineeringTeam():
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
+    def __init__(self, task_callback=None, step_callback=None):
+        self.task_callback = task_callback
+        self.step_callback = step_callback
+
     @agent
     def engineering_lead(self) -> Agent:
         return Agent(
@@ -89,4 +93,6 @@ class EngineeringTeam():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            task_callback=self.task_callback,
+            step_callback=self.step_callback,
         )

@@ -34,12 +34,13 @@ The AI Engineering Team is a production-grade multi-agent orchestration system b
 
 The team consists of four specialized AI agents collaborating in a sequential orchestration process:
 
-| Agent                 | Role      | Model               | Description                                                         |
-| --------------------- | --------- | ------------------- | ------------------------------------------------------------------- |
-| **Engineering Lead**  | Architect | `gpt-4o`            | Analyzes requirements and prepares a detailed architecture design.  |
-| **Backend Engineer**  | Developer | `claude-3-7-sonnet` | Implements the core logic following the lead's design.              |
-| **Frontend Engineer** | UI Expert | `claude-3-7-sonnet` | Builds a Gradio interface to demonstrate the backend functionality. |
-| **Test Engineer**     | QA        | `claude-3-7-sonnet` | Writes comprehensive unit tests to ensure reliability.              |
+| Agent                   | Role            | Model               | Description                                                           |
+| ----------------------- | --------------- | ------------------- | --------------------------------------------------------------------- |
+| **Engineering Lead**    | Architect       | `gpt-4o`            | Analyzes requirements and prepares a detailed architecture design.    |
+| **Backend Engineer**    | Developer       | `claude-3-7-sonnet` | Implements the core logic following the lead's design.                |
+| **Frontend Engineer**   | UI Expert       | `claude-3-7-sonnet` | Builds a Gradio interface to demonstrate the backend functionality.   |
+| **Test Engineer**       | QA              | `claude-3-7-sonnet` | Writes comprehensive unit tests to ensure reliability.                |
+| **Technical Writer**    | Documentation   | `claude-3-7-sonnet` | Generates a professional README.md and user guide for the built app.  |
 
 ---
 
@@ -51,9 +52,21 @@ graph TD
     Lead -->|Design Doc| Backend[Backend Engineer]
     Backend -->|Python Code| Frontend[Frontend Engineer]
     Backend -->|Python Code| QA[Test Engineer]
+    Backend -->|Python Code| Doc[Technical Writer]
     Frontend -->|app.py| Output[Generated Project ZIP]
     QA -->|tests.py| Output
+    Doc -->|README.md| Output
 ```
+
+---
+
+## 🔒 Usage Limits & Security
+
+To ensure a high-quality experience for all visitors and protect the project budget, the following limits are in place:
+
+- **Rate Limiting**: 15 full generation runs per IP address.
+- **Input Limit**: Requirements description is limited to 2000 characters.
+- **Concurrency**: The system handles one generation at a time via a queuing system.
 
 ---
 
