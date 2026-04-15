@@ -8,7 +8,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from engineering_team.crew import EngineeringTeam
-from engineering_team.utils import create_project_zip, cleanup_output
+from engineering_team.utils import create_project_zip, cleanup_output, sanitize_all_outputs
 
 # Rate Limiting Tracker
 IP_USAGE = {}
@@ -90,6 +90,9 @@ def solve_requirements(requirements, module_name, class_name, request: gr.Reques
     try:
         # Note: In a production environment, you might want to redirect stdout to capture logs
         result = EngineeringTeam().crew().kickoff(inputs=inputs)
+        
+        # Post-process: strip any LLM markdown artifacts (backticks) from Python files
+        sanitize_all_outputs('output', module_name)
         
         # Read generated files
         design_file = f"output/{module_name}_design.md"
