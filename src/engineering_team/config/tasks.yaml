@@ -1,11 +1,15 @@
 design_task:
   description: >
-    Take the high level requirements described here and prepare a detailed design for the engineer;
-    everything should be in 1 python module, but outline the classes and methods in the module.
-    Here are the requirements: {requirements}
-    IMPORTANT: Only output the design in markdown format, laying out in detail the classes and functions in the module, describing the functionality.
+    Take the high level requirements and prepare a professional Engineering Blueprint.
+    The goal is to provide a clean, high-level overview for a software architect, not a granular method-by-method dump.
+    Your output should be a well-structured Markdown document with:
+    1. System Overview: What the solution does and its primary value.
+    2. Component Roadmap: A high-level list of the main classes/components to be built (no full code here).
+    3. Logic Flow: Briefly describe how the system handles the main requirement (the "Happy Path").
+    Requirements: {requirements}
+    Keep it clean, concise, and professional.
   expected_output: >
-    A detailed design for the engineer, identifying the classes and functions in the module.
+    A professional Engineering Blueprint in Markdown format providing a high-level system overview.
   agent: engineering_lead
   output_file: output/{module_name}_design.md
 
