@@ -95,8 +95,19 @@ def create_project_zip(output_dir='output', zip_name_prefix='engineering_project
 
 def cleanup_output(output_dir='output'):
     """
-    Cleans up the output directory before a new run.
+    Cleans up the output directory AND deletes any old ZIP files starting with 'ai_engineered_'.
+    This is critical for long-running processes (like Hugging Face Spaces) to prevent disk bloat.
     """
+    # 1. Clean the output folder
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
     os.makedirs(output_dir, exist_ok=True)
+
+    # 2. Clean old ZIP files in the root/current directory
+    base_dir = os.path.dirname(os.path.abspath(output_dir))
+    for item in os.listdir(base_dir):
+        if item.endswith('.zip') and item.startswith('ai_engineered_'):
+            try:
+                os.remove(os.path.join(base_dir, item))
+            except Exception:
+                pass

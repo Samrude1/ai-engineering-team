@@ -11,7 +11,6 @@ design_task:
   expected_output: >
     A professional Engineering Blueprint in Markdown format.
   agent: engineering_lead
-  output_file: output/{module_name}_design.md
 
 code_task:
   description: >
@@ -60,4 +59,3 @@ documentation_task:
   context:
     - code_task
     - frontend_task
-  output_file: output/README.md
