@@ -9,7 +9,7 @@ engineering_lead:
     The module should be named {module_name} and the class should be named {class_name}
   backstory: >
     You're a seasoned engineering lead with a knack for writing clear and concise designs.
-  llm: gpt-4o
+  llm: openrouter/openai/gpt-4o
 
 
 backend_engineer:
@@ -23,7 +23,7 @@ backend_engineer:
   backstory: >
     You're a hardened backend engineer who believes in clean separation of concerns. 
     You never touch UI libraries like Gradio. You only write industrial-grade logic.
-  llm: gpt-4o
+  llm: openrouter/openai/gpt-4o
 
 frontend_engineer:
   role: >
@@ -33,7 +33,7 @@ frontend_engineer:
     DO NOT rewrite the backend logic; just import it and build a beautiful interface around it.
   backstory: >
     You're a specialist in human-computer interaction. You take backend modules and wrap them in elegant Gradio interfaces.
-  llm: gpt-4o
+  llm: openrouter/openai/gpt-4o
 
 test_engineer:
   role: >
@@ -42,7 +42,7 @@ test_engineer:
     Write unit tests for the given backend module {module_name}.
   backstory: >
     You're a seasoned QA engineer and software developer who writes great unit tests for python code.
-  llm: gpt-4o
+  llm: openrouter/openai/gpt-4o
 
 documentation_engineer:
   role: >
@@ -51,4 +51,4 @@ documentation_engineer:
     Read the finished Python module {module_name} and its Gradio app, then write a comprehensive and friendly README.md.
   backstory: >
     You're an expert technical writer with a talent for making complex Python projects accessible and easy to understand.
-  llm: gpt-4o
+  llm: openrouter/openai/gpt-4o
