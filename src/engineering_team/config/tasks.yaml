@@ -1,60 +1,49 @@
 design_task:
   description: >
-    Take the high level requirements and prepare a professional Engineering Blueprint.
-    The goal is to provide a clean, high-level overview for a software architect.
-    Your output should be a well-structured Markdown document with:
-    1. System Overview: What the solution does.
-    2. Component Roadmap: A high-level list of classes/components.
-    3. Logic Flow: Briefly describe how the system handles the main requirement.
+    Take the requirements and prepare an Engineering Blueprint.
+    The goal is to design the BACKEND LOGIC and class structure.
     Requirements: {requirements}
-    Keep it clean, concise, and professional.
   expected_output: >
     A professional Engineering Blueprint in Markdown format.
   agent: engineering_lead
 
 code_task:
   description: >
-    Write a python module that implements the design described by the engineering lead.
-    Requirements: {requirements}
-    IMPORTANT: You must output a JSON object with a 'code' field and a 'description' field.
-    The 'code' field should contain ONLY the raw Python code.
-    START the 'code' directly with the first line of code (import, class, etc.).
-    NO markdown formatting, no backticks, no preamble inside the 'code' field.
+    Write a python module that implements ONLY the backend business logic.
+    Class: {class_name}, Module: {module_name}
+    IMPORTANT: Do NOT include any Gradio, UI code, or 'if __name__ == "__main__"' launch blocks.
+    The code must be raw logic only.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
+    A JSON object with 'code' and 'description' fields. The 'code' must ONLY contain the class and logic.
   agent: backend_engineer
   context:
     - design_task
 
 frontend_task:
   description: >
-    Write a gradio UI in a module app.py that demonstrates the given backend class.
-    Requirements: {requirements}
-    IMPORTANT: You must output a JSON object with a 'code' field and a 'description' field.
-    The 'code' field should contain ONLY the raw Python code.
-    START the 'code' directly with the first line of code (import, etc.).
+    Write a Gradio UI in app.py that demonstrates the backend.
+    IMPORTANT: You MUST 'from {module_name} import {class_name}' and use it.
+    Do NOT rewrite the logic inside app.py.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
+    A JSON object with 'code' and 'description' fields. The 'code' must contain the Gradio app that imports and uses the backend.
   agent: frontend_engineer
   context:
     - code_task
 
 test_task:
   description: >
-    Write unit tests for the given backend module {module_name}.
+    Write unit tests for the backend module {module_name}.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must be raw Python.
+    A JSON object with 'code' and 'description' fields.
   agent: test_engineer
   context:
     - code_task
 
 documentation_task:
   description: >
-    Based on the finished Python module {module_name}, the Gradio app app.py, and the original requirements, write a professional README.md.
-    Requirements were: {requirements}
-    Sections: Title, Features, Structure, Setup, How to Use, Class Reference.
+    Write a professional README.md for the project based on the logic and UI created.
   expected_output: >
-    A well-structured README.md file in markdown format.
+    A well-structured README.md file.
   agent: documentation_engineer
   context:
     - code_task
