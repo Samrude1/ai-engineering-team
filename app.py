@@ -179,28 +179,45 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         target_file = None
         current_task_type = None
         
-        if "blueprint" in description: current_task_type = "design_task"
-        elif "write a python module" in description:
+        # Robust Task Identification
+        if "blueprint" in description or "engineering blueprint" in description:
+            current_task_type = "design_task"
+            target_file = os.path.join("output", f"{module_name}_design.md")
+        elif "python module" in description and "implements the design" in description:
             current_task_type = "code_task"
             target_file = os.path.join("output", module_name)
-        elif "write a gradio ui" in description:
+        elif "gradio ui" in description:
             current_task_type = "frontend_task"
             target_file = os.path.join("output", "app.py")
-        elif "write unit tests" in description:
+        elif "unit tests" in description:
             current_task_type = "test_task"
             target_file = os.path.join("output", f"test_{module_name}")
-        elif "readme.md" in description: current_task_type = "documentation_task"
+        elif "readme.md" in description or "professional readme" in description:
+            current_task_type = "documentation_task"
+            target_file = os.path.join("output", "README.md")
 
-        if target_file and task_output.pydantic:
+        if target_file:
             try:
-                code = task_output.pydantic.code
-                with open(target_file, "w", encoding="utf-8") as f: f.write(code)
-                strip_markdown_from_python(target_file)
+                if task_output.pydantic and hasattr(task_output.pydantic, 'code'):
+                    # Save Pydantic Code
+                    content = task_output.pydantic.code
+                else:
+                    # Save Raw String (for Design and README)
+                    content = str(task_output.raw)
+                
+                with open(target_file, "w", encoding="utf-8") as f:
+                    f.write(content)
+                
+                if target_file.endswith('.py'):
+                    strip_markdown_from_python(target_file)
+                
                 msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
-            except Exception as e: msg = f"[{timestamp}] ⚠️ Error: {str(e)}"
+            except Exception as e:
+                msg = f"[{timestamp}] ⚠️ Error saving {os.path.basename(target_file)}: {str(e)}"
         else:
             summary = TASK_LOG_MAP.get(current_task_type, f"Task Completed: {task_output.description[:40]}...")
             msg = f"[{timestamp}] ✅ {summary}"
+        
         log_queue.put(msg)
         
     def log_step(step_output):
