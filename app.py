@@ -179,30 +179,31 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         target_file = None
         current_task_type = None
         
-        # Robust Task Identification
-        if "blueprint" in description or "engineering blueprint" in description:
+        # Robust Multi-Keyword Task Identification
+        if any(kw in description for kw in ["blueprint", "architecture", "design task"]):
             current_task_type = "design_task"
             target_file = os.path.join("output", f"{module_name}_design.md")
-        elif "python module" in description and "implements the design" in description:
-            current_task_type = "code_task"
-            target_file = os.path.join("output", module_name)
-        elif "gradio ui" in description:
+        elif any(kw in description for kw in ["business logic", "logic only", "python module"]):
+            if "gradio ui" not in description: # Ensure we don't pick frontend task incorrectly
+                current_task_type = "code_task"
+                target_file = os.path.join("output", module_name)
+        
+        if "gradio ui" in description:
             current_task_type = "frontend_task"
             target_file = os.path.join("output", "app.py")
-        elif "unit tests" in description:
+        elif "unit tests" in description or "test task" in description:
             current_task_type = "test_task"
             target_file = os.path.join("output", f"test_{module_name}")
-        elif "readme.md" in description or "professional readme" in description:
+        elif any(kw in description for kw in ["readme.md", "professional readme", "documentation task"]):
             current_task_type = "documentation_task"
             target_file = os.path.join("output", "README.md")
 
         if target_file:
             try:
+                # Prioritize 'code' field if in Pydantic, otherwise use raw
                 if task_output.pydantic and hasattr(task_output.pydantic, 'code'):
-                    # Save Pydantic Code
                     content = task_output.pydantic.code
                 else:
-                    # Save Raw String (for Design and README)
                     content = str(task_output.raw)
                 
                 with open(target_file, "w", encoding="utf-8") as f:
