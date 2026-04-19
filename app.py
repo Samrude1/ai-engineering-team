@@ -251,7 +251,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
-    enriched_requirements = f"CRITICAL: Today is {today_str}. \n1. NO STALE DATA (no 2023 dates).\n2. USE GRADIO 5+ (gr.Blocks).\n3. PREMIUM UX: If the project involves locations (like weather), implement geocoding to allow searching by CITY NAME instead of coordinates.\n4. INDUSTRIAL QUALITY: Well-commented, robust error handling.\n\n{requirements}"
+    enriched_requirements = f"CRITICAL: Today is {today_str}. \n- NO STALE DATA (no 2023 dates).\n- USE GRADIO 5+ (gr.Blocks) for the UI.\n- INDUSTRIAL QUALITY: Well-commented, modular code, and robust error handling.\n\n### USER REQUIREMENTS:\n{requirements}"
     
     # Inject existing codebase context if in iterative mode
     codebase_context = ""

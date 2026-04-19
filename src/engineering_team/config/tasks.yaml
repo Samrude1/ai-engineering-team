@@ -1,59 +1,49 @@
 design_task:
   description: >
-    Take the requirements and prepare an Engineering Blueprint.
-    The goal is to design the BACKEND LOGIC and class structure.
+    Analyze the requirements and create a technical blueprint for the system.
+    Focus on class definitions, method signatures, and logic flow. 
     Requirements: {requirements}
   expected_output: >
-    A professional Engineering Blueprint in Markdown format.
+    A detailed architectural blueprint in Markdown format.
   agent: engineering_lead
 
 code_task:
   description: >
-    Write a python module that implements ONLY the backend business logic.
-    Class: {class_name}, Module: {module_name}
-    CRITICAL CONSTRAINT: Do NOT include ANY Gradio code, ANY UI code, or ANY launch blocks.
-    Your output must be 100% PURE logic. If you include 'import gradio', the system will fail.
-    Use real-world libraries where appropriate (e.g., requests for APIs). 
-    Ensure the data is current and not hardcoded to old dates.
-    The code must be raw logic only, industrial-grade, and well-commented.
+    Implement the designed logic in a pure Python module ({module_name}).
+    Ensure the class {class_name} is fully functional and follows the blueprint.
+    IMPORTANT: NO UI code, NO Gradio, and NO launch blocks allowed.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must ONLY contain the class and logic.
+    A single Python file containing the robust business logic.
   agent: backend_engineer
   context:
     - design_task
 
 frontend_task:
   description: >
-    Write a modern Gradio UI in app.py that demonstrates the backend.
-    IMPORTANT: You MUST 'from {module_name} import {class_name}' and use it.
-    Use ONLY modern Gradio 5+ syntax (no gr.inputs, no gr.outputs). 
-    Use gr.Blocks for a professional, responsive layout.
-    Do NOT rewrite the logic inside app.py.
+    Create a modern Gradio UI in app.py that imports and uses {class_name} from {module_name}. 
+    Use gr.Blocks (Gradio 5+) and ensure the UI is professional and responsive.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must contain the Gradio app that imports and uses the backend.
+    A Python file (app.py) containing the complete Gradio interface.
   agent: frontend_engineer
   context:
     - code_task
 
 test_task:
   description: >
-    Write unit tests for the backend module {module_name}.
+    Write a unit test suite for {module_name} that verifies all core functionalities.
+    Mock external dependencies and test for both success and error cases.
   expected_output: >
-    A JSON object with 'code' and 'description' fields.
+    A runnable Python test file.
   agent: test_engineer
   context:
     - code_task
 
 documentation_task:
   description: >
-    Write a professional and EXTREMELY SIMPLE README.md for the project. 
-    The goal is for a non-technical person to be able to run this immediately.
-    It MUST include a prominent "🚀 QUICK START" section at the very top with:
-    1. A single copy-pasteable block of commands to create venv, install requirements, and run the app.
-    2. Absolute dummy-proof step-by-step logic.
-    3. A brief explanation of why this code is high quality (separation of concerns, tests included).
+    Write a user-friendly README.md with a clear "🚀 QUICK START" section.
+    The guide must describe how to run the software in simple steps.
   expected_output: >
-    A user-friendly README.md file with prioritized Quick Start instructions.
+    A professional README file in Markdown.
   agent: documentation_engineer
   context:
     - code_task
@@ -61,12 +51,10 @@ documentation_task:
 
 requirements_task:
   description: >
-    Create a requirements.txt file listing all external dependencies.
-    COMPULSORY: Include 'gradio>=5.0.0' (since we use modern UI) and 'requests'.
-    DO NOT use old versions of Gradio (like 3.x).
-    List any other libraries the backend or tests might need.
+    Create a complete requirements.txt file for the project.
+    Always include 'gradio>=5.0.0' and 'requests'.
   expected_output: >
-    A JSON object with 'code' (string of the requirements.txt content) and 'description' fields.
+    A requirements.txt file with all dependencies.
   agent: documentation_engineer
   context:
     - code_task
