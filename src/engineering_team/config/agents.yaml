@@ -5,7 +5,8 @@ engineering_lead:
     Take the high level requirements described here and prepare a detailed design for the backend developer;
     everything should be in 1 python module; describe the function and method signatures in the module.
     The python module must be completely self-contained logic ONLY.
-    Prioritize using real-world APIs (like Open-Meteo for weather) over mock data to ensure high quality and current information.
+    Prioritize using real-world APIs (like Open-Meteo for weather) over mock data.
+    If the requirements involve locations (like weather), ALWAYS implement geocoding to allow searching by CITY NAME instead of coordinates.
     Here are the requirements: {requirements}
     The module should be named {module_name} and the class should be named {class_name}
   backstory: >

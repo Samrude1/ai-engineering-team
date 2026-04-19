@@ -230,7 +230,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
-    enriched_requirements = f"CRITICAL: The current date is {today_str}. Ensure all logic and data reflect this (no stale 2023 dates). Use ONLY latest library versions (Gradio 5+).\n\n{requirements}"
+    enriched_requirements = f"CRITICAL: Today is {today_str}. \n1. NO STALE DATA (no 2023 dates).\n2. USE GRADIO 5+ (gr.Blocks).\n3. PREMIUM UX: If asking for weather, allow searching by CITY NAME (implement geocoding). Users hate coordinates.\n4. INDUSTRIAL QUALITY: Well-commented, robust error handling.\n\n{requirements}"
     inputs = {'requirements': enriched_requirements, 'module_name': module_name, 'class_name': class_name}
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
     yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
@@ -280,7 +280,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
 def set_banking(): return "A secure, enterprise-grade personal banking system with accounts, transfers, and transaction history. Handle negative balances and fraud checks. Use modern Gradio 5+ for the dashboard.", "banking.py", "Bank"
-def set_weather(): return "A professional weather dashboard using a real-time API (Open-Meteo). Show a 5-day forecast with current conditions. Use modern Gradio 5+ (gr.Blocks) for a premium UI.", "weather_app.py", "WeatherSystem"
+def set_weather(): return "A professional weather dashboard using the Open-Meteo API. Enable City Name search (e.g. 'London', 'Tokyo') by implementing geocoding logic. Show 5-day forecast and current conditions. Use Gradio 5+ for a stunning UI.", "weather_app.py", "WeatherSystem"
 def set_trading(): return "A high-frequency trading simulation platform. Handle limit/market orders and portfolio rebalancing. Create a stunning, real-time updated dashboard with Gradio 5+.", "investment.py", "PortfolioManager"
 
 # Build UI
