@@ -25,8 +25,21 @@ The AI Engineering Team is a production-grade multi-agent orchestration system b
 > "A full-stack engineering team that delivers tested, documented, and demo-ready Python applications in under 10 minutes."
 
 - **Narrative**: Zero-to-one software development automation.
-- **Tech Stack**: CrewAI, Claude 3.7 Sonnet (Backend/Tests), GPT-4o (Lead/Architecture).
+- **Tech Stack**: CrewAI, GPT-4o (Full Team), Gradio 5.
 - **Output**: Complete Python backend, Gradio UI, and Pytest suite.
+
+---
+
+To get the most out of the **Version 2.0** Engineering Team, provide detailed, multi-step requirements. 
+
+### 🚀 Professional Case: Personal Expense Tracker
+> "Create a robust Personal Expense Tracking system to manage a monthly budget.
+> - The system should allow users to add income and record expenses with a specific category (e.g., Housing, Food, Fun).
+> - The system should calculate the current balance and show a summary of spending by category.
+> - The system should track a 'Monthly Budget Limit' and return a warning if an expense exceeds the remaining budget.
+> - The system should be able to report all transactions in a chronological list and calculate the total savings rate (%) at any point.
+> - **Business Rules**: Prevent the user from recording an expense if the balance is zero (unless credit is allowed). Ensure all transactions have a timestamp.
+> - **Logic**: Include a method to suggest a 'Savings Goal' based on current spending patterns (e.g., if total fun spending > 30%, suggest a 5% reduction)."
 
 ---
 
@@ -34,13 +47,13 @@ The AI Engineering Team is a production-grade multi-agent orchestration system b
 
 The team consists of four specialized AI agents collaborating in a sequential orchestration process:
 
-| Agent                   | Role            | Model               | Description                                                           |
-| ----------------------- | --------------- | ------------------- | --------------------------------------------------------------------- |
-| **Engineering Lead**    | Architect       | `gpt-4o`            | Analyzes requirements and prepares a detailed architecture design.    |
-| **Backend Engineer**    | Developer       | `claude-3-7-sonnet` | Implements the core logic following the lead's design.                |
-| **Frontend Engineer**   | UI Expert       | `claude-3-7-sonnet` | Builds a Gradio interface to demonstrate the backend functionality.   |
-| **Test Engineer**       | QA              | `claude-3-7-sonnet` | Writes comprehensive unit tests to ensure reliability.                |
-| **Technical Writer**    | Documentation   | `claude-3-7-sonnet` | Generates a professional README.md and user guide for the built app.  |
+| Agent                 | Role          | Model               | Description                                                          |
+| --------------------- | ------------- | ------------------- | -------------------------------------------------------------------- |
+| **Engineering Lead**  | Architect     | `gpt-4o`            | Analyzes requirements and prepares a detailed architecture design.   |
+| **Backend Engineer**  | Developer     | `claude-3-7-sonnet` | Implements the core logic following the lead's design.               |
+| **Frontend Engineer** | UI Expert     | `claude-3-7-sonnet` | Builds a Gradio interface to demonstrate the backend functionality.  |
+| **Test Engineer**     | QA            | `claude-3-7-sonnet` | Writes comprehensive unit tests to ensure reliability.               |
+| **Technical Writer**  | Documentation | `claude-3-7-sonnet` | Generates a professional README.md and user guide for the built app. |
 
 ---
 
