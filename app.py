@@ -7,7 +7,6 @@ import time
 from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
-os.environ["CREWAI_USE_DOCKER"] = "false"
 
 from engineering_team.crew import EngineeringTeam
 from engineering_team.utils import create_project_zip, cleanup_output, sanitize_all_outputs, strip_markdown_from_python

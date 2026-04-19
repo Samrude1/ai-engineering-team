@@ -2,6 +2,7 @@
 import sys
 import warnings
 import os
+os.environ["CREWAI_USE_DOCKER"] = "false"
 from datetime import datetime
 
 from engineering_team.crew import EngineeringTeam
