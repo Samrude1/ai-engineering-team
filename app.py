@@ -176,31 +176,33 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
     log_queue = queue.Queue()
     os.makedirs('output', exist_ok=True)
     
+    result_container = {"success": False, "data": None, "error": None, "done": False, "task_index": 0}
+    
     def log_task(task_output):
         timestamp = datetime.now().strftime("%H:%M:%S")
-        description = task_output.description.lower()
+        result_container["task_index"] += 1
+        idx = result_container["task_index"]
+        
         target_file = None
         current_task_type = None
         
-        # Robust Multi-Keyword Task Identification
-        if any(kw in description for kw in ["blueprint", "architecture", "design task"]):
+        # Mapping by sequential index (1-based)
+        if idx == 1: # design_task
             current_task_type = "design_task"
             target_file = os.path.join("output", f"{module_name}_design.md")
-        elif any(kw in description for kw in ["business logic", "logic only", "python module"]):
-            if "gradio ui" not in description: # Ensure we don't pick frontend task incorrectly
-                current_task_type = "code_task"
-                target_file = os.path.join("output", module_name)
-        
-        if "gradio ui" in description:
+        elif idx == 2: # code_task
+            current_task_type = "code_task"
+            target_file = os.path.join("output", module_name)
+        elif idx == 3: # frontend_task
             current_task_type = "frontend_task"
             target_file = os.path.join("output", "app.py")
-        elif "unit tests" in description or "test task" in description:
+        elif idx == 4: # test_task
             current_task_type = "test_task"
             target_file = os.path.join("output", f"test_{module_name}")
-        elif any(kw in description for kw in ["readme.md", "professional readme", "documentation task"]):
+        elif idx == 5: # documentation_task
             current_task_type = "documentation_task"
             target_file = os.path.join("output", "README.md")
-        elif any(kw in description for kw in ["requirements.txt", "external dependencies", "requirements task"]):
+        elif idx == 6: # requirements_task
             current_task_type = "requirements_task"
             target_file = os.path.join("output", "requirements.txt")
 
@@ -271,7 +273,6 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
     yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
     
-    result_container = {"success": False, "data": None, "error": None, "done": False}
     def run_crew():
         try:
             crew_obj = EngineeringTeam(task_callback=log_task, step_callback=log_step).crew()

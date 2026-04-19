@@ -1,10 +1,11 @@
 design_task:
   description: >
-    Analyze the requirements and create a technical blueprint for the system.
-    Focus on class definitions, method signatures, and logic flow. 
+    Take the requirements and prepare an Engineering Blueprint in Markdown.
+    The goal is to design the BACKEND LOGIC and class structure.
+    IMPORTANT: Provide a structured report with headers. Do NOT write full Python code blocks here; only signatures.
     Requirements: {requirements}
   expected_output: >
-    A detailed architectural blueprint in Markdown format.
+    A clean, structured Markdown blueprint (no full code blocks).
   agent: engineering_lead
 
 code_task:
