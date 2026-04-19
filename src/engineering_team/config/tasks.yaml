@@ -12,7 +12,9 @@ code_task:
     Write a python module that implements ONLY the backend business logic.
     Class: {class_name}, Module: {module_name}
     IMPORTANT: Do NOT include any Gradio, UI code, or 'if __name__ == "__main__"' launch blocks.
-    The code must be raw logic only.
+    Use real-world libraries where appropriate (e.g., requests for APIs). 
+    Ensure the data is current and not hardcoded to old dates.
+    The code must be raw logic only, industrial-grade, and well-commented.
   expected_output: >
     A JSON object with 'code' and 'description' fields. The 'code' must ONLY contain the class and logic.
   agent: backend_engineer
@@ -21,8 +23,10 @@ code_task:
 
 frontend_task:
   description: >
-    Write a Gradio UI in app.py that demonstrates the backend.
+    Write a modern Gradio UI in app.py that demonstrates the backend.
     IMPORTANT: You MUST 'from {module_name} import {class_name}' and use it.
+    Use ONLY modern Gradio 5+ syntax (no gr.inputs, no gr.outputs). 
+    Use gr.Blocks for a professional, responsive layout.
     Do NOT rewrite the logic inside app.py.
   expected_output: >
     A JSON object with 'code' and 'description' fields. The 'code' must contain the Gradio app that imports and uses the backend.

@@ -213,6 +213,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                     strip_markdown_from_python(target_file)
                 
                 msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
+                if current_task_type == "documentation_task":
+                    msg += "\nFinishedSuccessfully"
             except Exception as e:
                 msg = f"[{timestamp}] ⚠️ Error saving {os.path.basename(target_file)}: {str(e)}"
         else:
@@ -227,7 +229,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         if hasattr(step_output, 'agent'): msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
         log_queue.put(msg)
 
-    inputs = {'requirements': requirements, 'module_name': module_name, 'class_name': class_name}
+    today_str = datetime.now().strftime("%B %d, %Y")
+    enriched_requirements = f"CRITICAL: The current date is {today_str}. Ensure all logic and data reflect this (no stale 2023 dates). Use ONLY latest library versions (Gradio 5+).\n\n{requirements}"
+    inputs = {'requirements': enriched_requirements, 'module_name': module_name, 'class_name': class_name}
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
     yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
     
@@ -275,9 +279,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
-def set_banking(): return "A secure personal banking system with accounts, transfers, and transaction history. Needs to handle negative balances and basic fraud checks.", "banking.py", "Bank"
-def set_weather(): return "A weather dashboard that integrates with a mock API. Users can search for cities and see a 5-day forecast. Use Gradio for the UI.", "weather_app.py", "WeatherSystem"
-def set_trading(): return "A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing.", "investment.py", "PortfolioManager"
+def set_banking(): return "A secure, enterprise-grade personal banking system with accounts, transfers, and transaction history. Handle negative balances and fraud checks. Use modern Gradio 5+ for the dashboard.", "banking.py", "Bank"
+def set_weather(): return "A professional weather dashboard using a real-time API (Open-Meteo). Show a 5-day forecast with current conditions. Use modern Gradio 5+ (gr.Blocks) for a premium UI.", "weather_app.py", "WeatherSystem"
+def set_trading(): return "A high-frequency trading simulation platform. Handle limit/market orders and portfolio rebalancing. Create a stunning, real-time updated dashboard with Gradio 5+.", "investment.py", "PortfolioManager"
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:

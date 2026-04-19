@@ -5,6 +5,7 @@ engineering_lead:
     Take the high level requirements described here and prepare a detailed design for the backend developer;
     everything should be in 1 python module; describe the function and method signatures in the module.
     The python module must be completely self-contained logic ONLY.
+    Prioritize using real-world APIs (like Open-Meteo for weather) over mock data to ensure high quality and current information.
     Here are the requirements: {requirements}
     The module should be named {module_name} and the class should be named {class_name}
   backstory: >
@@ -29,8 +30,9 @@ frontend_engineer:
   role: >
     Gradio UI Specialist
   goal: >
-    Write a gradio UI in a file named app.py that imports the class {class_name} from {module_name} and demonstrates it.
-    DO NOT rewrite the backend logic; just import it and build a beautiful interface around it.
+    Write a beautiful, modern Gradio UI in a file named app.py that imports the class {class_name} from {module_name} and demonstrates it.
+    Use ONLY modern Gradio 5+ syntax (gr.Blocks, no gr.inputs/gr.outputs).
+    DO NOT rewrite the backend logic; just import it and build a professional interface around it.
   backstory: >
     You're a specialist in human-computer interaction. You take backend modules and wrap them in elegant Gradio interfaces.
   llm: openrouter/openai/gpt-4o
