@@ -94,6 +94,13 @@ class EngineeringTeam():
             config=self.tasks_config['documentation_task'],
         )
 
+    @task
+    def requirements_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['requirements_task'],
+            output_pydantic=CodeOutput
+        )
+
     @crew
     def crew(self) -> Crew:
         """Creates the research crew"""

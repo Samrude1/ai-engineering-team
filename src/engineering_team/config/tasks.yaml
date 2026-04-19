@@ -45,10 +45,25 @@ test_task:
 
 documentation_task:
   description: >
-    Write a professional README.md for the project based on the logic and UI created.
+    Write a professional and EXTREMELY SIMPLE README.md for the project. 
+    The goal is for a non-technical recruiter to be able to run this immediately.
+    It MUST include a prominent "🚀 QUICK START" section at the very top with:
+    1. A single copy-pasteable block of commands to create venv, install requirements, and run the app.
+    2. Absolute dummy-proof step-by-step logic.
+    3. A brief explanation of why this code is high quality (separation of concerns, tests included).
   expected_output: >
-    A well-structured README.md file.
+    A recruiter-friendly README.md file with prioritized Quick Start instructions.
   agent: documentation_engineer
+  context:
+    - code_task
+    - frontend_task
+
+requirements_task:
+  description: >
+    Create a requirements.txt file listing all external dependencies used in the project (e.g., gradio, requests).
+  expected_output: >
+    A JSON object with 'code' (string of the requirements.txt content) and 'description' fields.
+  agent: backend_engineer
   context:
     - code_task
     - frontend_task

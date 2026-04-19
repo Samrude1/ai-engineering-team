@@ -197,6 +197,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         elif any(kw in description for kw in ["readme.md", "professional readme", "documentation task"]):
             current_task_type = "documentation_task"
             target_file = os.path.join("output", "README.md")
+        elif any(kw in description for kw in ["requirements.txt", "external dependencies", "requirements task"]):
+            current_task_type = "requirements_task"
+            target_file = os.path.join("output", "requirements.txt")
 
         if target_file:
             try:
@@ -279,9 +282,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
-def set_banking(): return "A secure, enterprise-grade personal banking system with accounts, transfers, and transaction history. Handle negative balances and fraud checks. Use modern Gradio 5+ for the dashboard.", "banking.py", "Bank"
-def set_weather(): return "A professional weather dashboard using the Open-Meteo API. Enable City Name search (e.g. 'London', 'Tokyo') by implementing geocoding logic. Show 5-day forecast and current conditions. Use Gradio 5+ for a stunning UI.", "weather_app.py", "WeatherSystem"
-def set_trading(): return "A high-frequency trading simulation platform. Handle limit/market orders and portfolio rebalancing. Create a stunning, real-time updated dashboard with Gradio 5+.", "investment.py", "PortfolioManager"
+def set_banking(): return "A lightweight banking showcase. Users can see a balance, make simple transfers, and view history. Keep it visual, simple, and clean for a quick recruiter demo. Use Gradio 5+.", "banking.py", "Bank"
+def set_weather(): return "A lightweight weather showcase using Open-Meteo. Search by city name and show a clear 5-day forecast. Focus on a beautiful, minimal UI that works instantly. Use Gradio 5+.", "weather_app.py", "WeatherSystem"
+def set_trading(): return "A lightweight trading showcase. Simple limit/market orders and a clean portfolio view. Focus on the visual dashboard experience for recruiters. Use Gradio 5+.", "investment.py", "PortfolioManager"
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
