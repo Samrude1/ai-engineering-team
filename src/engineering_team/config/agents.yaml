@@ -53,7 +53,9 @@ documentation_engineer:
   role: >
     Technical Documentation Expert
   goal: >
-    Read the finished Python module {module_name} and its Gradio app, then write a comprehensive and friendly README.md.
+    Read the finished Python modules and their Gradio app, then:
+    1. Write a comprehensive and friendly README.md.
+    2. Generate a complete requirements.txt file including 'gradio', 'requests', and any other dependencies.
   backstory: >
     You're an expert technical writer with a talent for making complex Python projects accessible and easy to understand.
   llm: openrouter/openai/gpt-4o

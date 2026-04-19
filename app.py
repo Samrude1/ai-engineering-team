@@ -209,6 +209,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                 else:
                     content = str(task_output.raw)
                 
+                if current_task_type == "requirements_task":
+                    if "gradio" not in content.lower(): content += "\ngradio"
+                    if "requests" not in content.lower(): content += "\nrequests"
+                
                 with open(target_file, "w", encoding="utf-8") as f:
                     f.write(content)
                 

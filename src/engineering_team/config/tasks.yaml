@@ -61,10 +61,12 @@ documentation_task:
 
 requirements_task:
   description: >
-    Create a requirements.txt file listing all external dependencies used in the project (e.g., gradio, requests).
+    Create a requirements.txt file listing all external dependencies.
+    COMPULSORY: Include 'gradio' (since we use it for UI) and 'requests' (if APIs are used).
+    List any other libraries the backend or tests might need.
   expected_output: >
     A JSON object with 'code' (string of the requirements.txt content) and 'description' fields.
-  agent: backend_engineer
+  agent: documentation_engineer
   context:
     - code_task
     - frontend_task
