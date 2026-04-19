@@ -30,6 +30,10 @@ def strip_markdown_from_python(file_path: str):
 
     # 4. Entry Point Scan: Discard all preamble lines
     lines = content.split('\n')
+    
+    # NEW: Specific removal of shebangs and coding declarations that clutter Windows/Web environments
+    lines = [l for l in lines if not l.startswith(('#!', '# -*- coding:'))]
+    
     start_idx = 0
     found_start = False
     for i, line in enumerate(lines):
@@ -44,8 +48,11 @@ def strip_markdown_from_python(file_path: str):
     
     if found_start:
         content = '\n'.join(lines[start_idx:])
+    else:
+        content = '\n'.join(lines)
 
     # 5. Final pass: ensure no trailing markdown garbage
+    content = content.strip()
     if content.endswith('```'):
         content = content[:-3].strip()
 

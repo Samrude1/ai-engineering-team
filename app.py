@@ -231,11 +231,6 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                     content = content.replace("readonly=True", "interactive=False")
                     content = content.replace("readonly = True", "interactive=False")
                     
-                    # Remove Linux-style shebangs for a cleaner Windows experience
-                    if content.startswith("#!"):
-                        content_lines = content.split("\n")
-                        content = "\n".join([l for l in content_lines if not l.startswith("#!")])
-                    
                     strip_markdown_from_python(target_file)
                     # Brute-force: Remove any Gradio leakage from backend modules
                     if current_task_type == "code_task":

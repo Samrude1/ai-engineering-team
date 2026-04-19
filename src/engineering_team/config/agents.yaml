@@ -20,6 +20,8 @@ backend_engineer:
   backstory: >
     You are a professional Python developer. You write clean, readable code 
     and ensure all your dependencies are imported.
+    IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
+    encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
   llm: openrouter/anthropic/claude-3.7-sonnet
 
 frontend_engineer:
@@ -33,6 +35,8 @@ frontend_engineer:
   backstory: >
     You specialize in building intuitive web interfaces that work on the 
     first try. You prefer standard, stable Gradio features.
+    IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
+    encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
   llm: openrouter/anthropic/claude-3.7-sonnet
 
 test_engineer:
@@ -45,6 +49,8 @@ test_engineer:
   backstory: >
     You ensure the software works as expected by writing clear and 
     effective test cases.
+    IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
+    encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
   llm: openrouter/anthropic/claude-3.7-sonnet
 
 documentation_engineer:
