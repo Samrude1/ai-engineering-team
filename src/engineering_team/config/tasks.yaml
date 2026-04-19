@@ -39,9 +39,12 @@ frontend_task:
 test_task:
   description: >
     Write a unit test suite for {module_name} that verifies all core functionalities.
-    Mock external dependencies and test for both success and error cases.
+    COMPULSORY:
+    1. Include all required imports (e.g., 'import unittest', 'import math', 'from {module_name} import {class_name}').
+    2. MATH VERIFICATION: Double-check all mathematical assertions against standard formulas. 
+    3. ROBUST MOCKING: Mock external APIs to handle success and error cases.
   expected_output: >
-    A runnable Python test file.
+    A runnable Python test file with all necessary imports.
   agent: test_engineer
   context:
     - code_task
@@ -60,9 +63,12 @@ documentation_task:
 requirements_task:
   description: >
     Create a complete requirements.txt file for the project.
-    Always include 'gradio>=5.0.0' and 'requests'.
+    IMPORTANT: 
+    1. Include ONLY external libraries (e.g., 'gradio>=5.0.0', 'requests', 'pandas').
+    2. DO NOT include Python standard libraries (e.g., 'math', 'os', 'json', 'sys', 'datetime', 'random', 'unittest'). 
+    Standard libraries are built-in and will cause pip install errors.
   expected_output: >
-    A requirements.txt file with all dependencies.
+    A requirements.txt file with ONLY external dependencies.
   agent: documentation_engineer
   context:
     - code_task

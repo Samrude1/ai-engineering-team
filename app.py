@@ -221,6 +221,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
                         content = "\n".join([l for l in content.split("\n") if "gradio" not in l.lower()])
                         content += "\ngradio>=5.0.0"
                     if "requests" not in content.lower(): content += "\nrequests"
+                    
+                    # Remove standard libraries that AI often incorrectly includes
+                    std_libs = ["math", "os", "sys", "json", "datetime", "random", "re", "time", "unittest", "logging"]
+                    content = "\n".join([l for l in content.split("\n") if l.strip().lower() not in std_libs])
                 
                 with open(target_file, "w", encoding="utf-8") as f:
                     f.write(content)
