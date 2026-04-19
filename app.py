@@ -214,6 +214,13 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                 
                 if target_file.endswith('.py'):
                     strip_markdown_from_python(target_file)
+                    # Brute-force: Remove any Gradio leakage from backend modules
+                    if current_task_type == "code_task":
+                        with open(target_file, 'r', encoding='utf-8') as f:
+                            lines = f.readlines()
+                        clean_lines = [l for l in lines if not any(bad in l.lower() for bad in ["import gradio", "from gradio", "gr.", ".launch("])]
+                        with open(target_file, 'w', encoding='utf-8') as f:
+                            f.writelines(clean_lines)
                 
                 msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
                 if current_task_type == "documentation_task":
@@ -301,7 +308,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                     value=""
                 )
                 with gr.Row():
-                    mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="app.py")
+                    mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="logic.py")
                     cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
                 
                 run_btn = gr.Button("Execute Engineering Task", variant="primary")
