@@ -25,8 +25,8 @@ def strip_markdown_from_python(file_path: str):
     if wrapper_match:
         content = wrapper_match.group(2).strip()
 
-    # 3. Clean any remaining outer quotes or ticks
-    content = content.strip().strip('`').strip('"').strip("'").strip()
+    # 3. Clean any remaining outer backticks (fences)
+    content = content.strip().strip('`').strip()
 
     # 4. Entry Point Scan: Discard all preamble lines
     lines = content.split('\n')
