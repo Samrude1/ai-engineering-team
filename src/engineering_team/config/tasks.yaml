@@ -62,7 +62,8 @@ documentation_task:
 requirements_task:
   description: >
     Create a requirements.txt file listing all external dependencies.
-    COMPULSORY: Include 'gradio' (since we use it for UI) and 'requests' (if APIs are used).
+    COMPULSORY: Include 'gradio>=5.0.0' (since we use modern UI) and 'requests'.
+    DO NOT use old versions of Gradio (like 3.x).
     List any other libraries the backend or tests might need.
   expected_output: >
     A JSON object with 'code' (string of the requirements.txt content) and 'description' fields.

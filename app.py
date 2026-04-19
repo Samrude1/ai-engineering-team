@@ -157,7 +157,7 @@ div.tabs button.selected {
 }
 """
 
-def solve_requirements_streaming(requirements, module_name, class_name, request: gr.Request):
+def solve_requirements_streaming(requirements, module_name, class_name, iterative_mode, request: gr.Request):
     client_ip = request.client.host if request else "unknown"
     if client_ip not in IP_USAGE: IP_USAGE[client_ip] = 0
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
@@ -168,7 +168,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         yield ("⚠️ Please enter your requirements.", "", "", "", "", "", "Input Error: Empty requirements.", gr.update(visible=False))
         return
 
-    cleanup_output('output')
+    # Decide whether to wipe or keep existing work
+    if not iterative_mode:
+        cleanup_output('output')
+    
     IP_USAGE[client_ip] += 1
     log_queue = queue.Queue()
     os.makedirs('output', exist_ok=True)
@@ -210,7 +213,11 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                     content = str(task_output.raw)
                 
                 if current_task_type == "requirements_task":
-                    if "gradio" not in content.lower(): content += "\ngradio"
+                    # Force modern Gradio if agent uses an old version or omits it
+                    if "gradio" not in content.lower() or "gradio==" in content.lower() or "gradio<" in content.lower():
+                        # Strip any existing gradio line and add the modern one
+                        content = "\n".join([l for l in content.split("\n") if "gradio" not in l.lower()])
+                        content += "\ngradio>=5.0.0"
                     if "requests" not in content.lower(): content += "\nrequests"
                 
                 with open(target_file, "w", encoding="utf-8") as f:
@@ -245,6 +252,21 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
 
     today_str = datetime.now().strftime("%B %d, %Y")
     enriched_requirements = f"CRITICAL: Today is {today_str}. \n1. NO STALE DATA (no 2023 dates).\n2. USE GRADIO 5+ (gr.Blocks).\n3. PREMIUM UX: If asking for weather, allow searching by CITY NAME (implement geocoding). Users hate coordinates.\n4. INDUSTRIAL QUALITY: Well-commented, robust error handling.\n\n{requirements}"
+    
+    # Inject existing codebase context if in iterative mode
+    codebase_context = ""
+    if iterative_mode and os.path.exists('output'):
+        for file in os.listdir('output'):
+            if file.endswith(('.py', '.md')):
+                path = os.path.join('output', file)
+                try:
+                    with open(path, 'r', encoding='utf-8') as f:
+                        codebase_context += f"\n--- EXISTING FILE: {file} ---\n{f.read()}\n"
+                except: pass
+    
+    if codebase_context:
+        enriched_requirements = f"CODEBASE UPDATE CONTEXT:\nThe following files already exist in the project. Maintain consistency and update them according to the new instructions.\n{codebase_context}\n\nUSER UPDATE REQUEST:\n{enriched_requirements}"
+
     inputs = {'requirements': enriched_requirements, 'module_name': module_name, 'class_name': class_name}
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
     yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
@@ -315,6 +337,8 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                     mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="logic.py")
                     cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
                 
+                iter_mode = gr.Checkbox(label="🔄 Iterative Mode (Keep & Update Existing Codebase)", value=False)
+                
                 run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
             status = gr.Markdown("Ready to engineer.")
@@ -342,7 +366,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
 
     run_btn.click(
         fn=solve_requirements_streaming,
-        inputs=[reqs, mod_name, cls_name],
+        inputs=[reqs, mod_name, cls_name, iter_mode],
         outputs=[status, design_out, code_out, app_out, test_out, readme_out, terminal_log, download_btn]
     )
     
