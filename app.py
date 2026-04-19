@@ -65,8 +65,8 @@ p, li, th, td, label, span {
     color: #374151 !important; /* Slate 700 */
 }
 
-/* Inputs */
-input, textarea {
+/* Inputs (Exclude Checkboxes from global overrides) */
+input:not([type="checkbox"]), textarea {
     background-color: #ffffff !important;
     border: 1px solid #d4d4d4 !important;
     border-radius: 6px !important;
@@ -251,7 +251,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
-    enriched_requirements = f"CRITICAL: Today is {today_str}. \n1. NO STALE DATA (no 2023 dates).\n2. USE GRADIO 5+ (gr.Blocks).\n3. PREMIUM UX: If asking for weather, allow searching by CITY NAME (implement geocoding). Users hate coordinates.\n4. INDUSTRIAL QUALITY: Well-commented, robust error handling.\n\n{requirements}"
+    enriched_requirements = f"CRITICAL: Today is {today_str}. \n1. NO STALE DATA (no 2023 dates).\n2. USE GRADIO 5+ (gr.Blocks).\n3. PREMIUM UX: If the project involves locations (like weather), implement geocoding to allow searching by CITY NAME instead of coordinates.\n4. INDUSTRIAL QUALITY: Well-commented, robust error handling.\n\n{requirements}"
     
     # Inject existing codebase context if in iterative mode
     codebase_context = ""
