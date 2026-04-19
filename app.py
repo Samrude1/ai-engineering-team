@@ -226,6 +226,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, iterativ
                     f.write(content)
                 
                 if target_file.endswith('.py'):
+                    # Fix common AI deprecation mistakes
+                    content = content.replace("readonly=True", "interactive=False")
+                    content = content.replace("readonly = True", "interactive=False")
+                    
                     strip_markdown_from_python(target_file)
                     # Brute-force: Remove any Gradio leakage from backend modules
                     if current_task_type == "code_task":

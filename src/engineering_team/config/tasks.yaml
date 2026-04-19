@@ -21,10 +21,15 @@ code_task:
 
 frontend_task:
   description: >
-    Create a modern Gradio UI in app.py that imports and uses {class_name} from {module_name}. 
-    Use gr.Blocks (Gradio 5+) and ensure the UI is professional and responsive.
+    Write a modern Gradio UI in app.py that demonstrates the backend.
+    IMPORTANT: You MUST 'from {module_name} import {class_name}' and use it.
+    MODERN GRADIO 5+ RULES:
+    1. Do NOT use 'readonly=True'. Use 'interactive=False' instead.
+    2. Use ONLY gr.Blocks for the layout.
+    3. Do NOT use deprecated gr.inputs or gr.outputs.
+    4. Ensure the UI is professional and demonstrates all features of the backend.
   expected_output: >
-    A Python file (app.py) containing the complete Gradio interface.
+    A JSON object with 'code' and 'description' fields. The 'code' must contain the Gradio app.
   agent: frontend_engineer
   context:
     - code_task
