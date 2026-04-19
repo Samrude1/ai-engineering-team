@@ -43,11 +43,20 @@ test_task:
 
 documentation_task:
   description: >
-    Finalize the project with a professional README.md and requirements.txt.
-    - Documentation should be Windows-optimized (use 'python', not 'python3').
-    - requirements.txt should only include external libraries.
+    Generate a professional README.md for the project.
+    Ensure it is Windows-friendly (use 'python', not 'python3').
   expected_output: >
-    A professional README.md and a clean requirements.txt.
+    A professional README.md file.
+  agent: documentation_engineer
+  context:
+    - code_task
+    - frontend_task
+
+requirements_task:
+  description: >
+    Create a requirements.txt file with only external dependencies.
+  expected_output: >
+    A clean requirements.txt file.
   agent: documentation_engineer
   context:
     - code_task
