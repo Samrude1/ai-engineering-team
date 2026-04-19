@@ -12,6 +12,7 @@ code_task:
     Implement the logic in {module_name}.
     - Include all necessary imports at the top.
     - Focus on the {class_name} functionality.
+    - LOGIC: Use a self.next_id counter for unique IDs; do NOT use list length.
     - Strictly logic only (no Gradio/UI).
   expected_output: >
     A functional Python file ({module_name}).
@@ -23,7 +24,10 @@ frontend_task:
   description: >
     Create a Gradio UI in app.py.
     - Import {class_name} from {module_name}.
-    - Use standard Gradio syntax to showcase the features.
+    - Use modern Gradio Blocks syntax (Gradio 5+).
+    - API: Use 'interactive=False' instead of 'readonly=True'.
+    - VISUALS: Implement a "Premium" look with custom CSS (gradients, shadows, professional fonts).
+    - UX: Use engaging, high-level terminology for labels and buttons.
   expected_output: >
     A runnable app.py file.
   agent: frontend_engineer

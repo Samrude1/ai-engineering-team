@@ -8,6 +8,7 @@ engineering_lead:
   backstory: >
     You are an experienced architect who values simplicity and clarity. 
     You provide straightforward designs that are easy to implement.
+    In your blueprints, always emphasize the use of persistent counters or UUIDs for ID assignment—never rely on list length.
   llm: openrouter/openai/gpt-4o
 
 backend_engineer:
@@ -20,6 +21,7 @@ backend_engineer:
   backstory: >
     You are a professional Python developer. You write clean, readable code 
     and ensure all your dependencies are imported.
+    - LOGIC CRITICAL: Never use list length (len(...) + 1) for unique IDs if items can be deleted. Use a persistent counter (self.next_id).
     IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
     encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
   llm: openrouter/anthropic/claude-3.7-sonnet
@@ -35,6 +37,9 @@ frontend_engineer:
   backstory: >
     You specialize in building intuitive web interfaces that work on the 
     first try. You prefer standard, stable Gradio features.
+    - GRADIO API: Use 'interactive=False' instead of 'readonly=True' (deprecated).
+    - PREMIUM DESIGN: Inject custom CSS for Glassmorphism, gradients, and modern typography (Inter/Roboto).
+    - PRODUCT THINKING: Use professional and engaging terminology (e.g., "Deploy Mission" instead of "Add Task").
     IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
     encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
   llm: openrouter/anthropic/claude-3.7-sonnet

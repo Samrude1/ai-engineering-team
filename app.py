@@ -258,7 +258,15 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
-    enriched_requirements = f"CRITICAL: Today is {today_str}. \n- NO STALE DATA (no 2023 dates).\n- USE GRADIO 5+ (gr.Blocks) for the UI.\n- INDUSTRIAL QUALITY: Well-commented, modular code, and robust error handling.\n\n### USER REQUIREMENTS:\n{requirements}"
+    enriched_requirements = (
+        f"CRITICAL: Today is {today_str}.\n"
+        "- LOGIC: Never use len(list)+1 for IDs; use a persistent self.next_id counter.\n"
+        "- API: Use 'interactive=False' for read-only fields (Gradio 5+).\n"
+        "- AESTHETICS: Implement 'Premium' design with custom CSS (Glassmorphism/Gradients).\n"
+        "- UX: Use professional terminology (e.g. 'Deploy Task') and provide clear feedback logs.\n"
+        "- INDUSTRIAL QUALITY: Well-commented, modular code, and robust error handling.\n\n"
+        f"### USER REQUIREMENTS:\n{requirements}"
+    )
     
     inputs = {'requirements': enriched_requirements, 'module_name': module_name, 'class_name': class_name}
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
