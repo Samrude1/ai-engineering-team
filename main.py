@@ -4,6 +4,8 @@ import warnings
 import dotenv
 from dotenv import load_dotenv
 from datetime import datetime
+import os
+os.environ["CREWAI_USE_DOCKER"] = "false"
 from engineering_team.crew import EngineeringTeam
 
 load_dotenv()
