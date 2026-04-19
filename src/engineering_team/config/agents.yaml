@@ -24,7 +24,7 @@ backend_engineer:
     You are a specialized backend developer who believes in the absolute separation of 
     concerns. You write clean, well-tested, and robust Python code without any 
     dependence on UI libraries.
-  llm: openrouter/openai/gpt-4o
+  llm: openrouter/anthropic/claude-3.7-sonnet
 
 frontend_engineer:
   role: >
@@ -37,7 +37,7 @@ frontend_engineer:
     You are a frontend expert specialized in building state-of-the-art web interfaces 
     using Gradio. You focus on premium aesthetics, smooth transitions, and 
     intuitive user flows.
-  llm: openrouter/openai/gpt-4o
+  llm: openrouter/anthropic/claude-3.7-sonnet
 
 test_engineer:
   role: >
@@ -50,7 +50,7 @@ test_engineer:
     You are a meticulous QA engineer who leaves no bug unfound. 
     You specialize in writing reliable, self-contained test suites that cover 
     edge cases and error handling.
-  llm: openrouter/openai/gpt-4o
+  llm: openrouter/anthropic/claude-3.7-sonnet
 
 documentation_engineer:
   role: >
@@ -62,4 +62,4 @@ documentation_engineer:
   backstory: >
     You are a technical writer who turns complex codebases into user-friendly products. 
     You ensure that even a non-technical person can start the software in seconds.
-  llm: openrouter/openai/gpt-4o
+  llm: openrouter/google/gemini-2.0-flash-001
