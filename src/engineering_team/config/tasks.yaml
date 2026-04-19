@@ -11,7 +11,8 @@ code_task:
   description: >
     Write a python module that implements ONLY the backend business logic.
     Class: {class_name}, Module: {module_name}
-    IMPORTANT: Do NOT include any Gradio, UI code, or 'if __name__ == "__main__"' launch blocks.
+    CRITICAL CONSTRAINT: Do NOT include ANY Gradio code, ANY UI code, or ANY launch blocks.
+    Your output must be 100% PURE logic. If you include 'import gradio', the system will fail.
     Use real-world libraries where appropriate (e.g., requests for APIs). 
     Ensure the data is current and not hardcoded to old dates.
     The code must be raw logic only, industrial-grade, and well-commented.
