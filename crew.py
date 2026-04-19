@@ -1,11 +1,5 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from pydantic import BaseModel, Field
-
-
-class CodeOutput(BaseModel):
-    code: str = Field(description="The full Python source code.")
-    description: str = Field(description="A brief description of what the code does.")
 
 
 
@@ -15,10 +9,6 @@ class EngineeringTeam():
 
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
-
-    def __init__(self, task_callback=None, step_callback=None):
-        self.task_callback = task_callback
-        self.step_callback = step_callback
 
     @agent
     def engineering_lead(self) -> Agent:
@@ -33,6 +23,7 @@ class EngineeringTeam():
             config=self.agents_config['backend_engineer'],
             verbose=True,
             allow_code_execution=True,
+            code_execution_mode="safe",  # Uses Docker for safety
             max_execution_time=500, 
             max_retry_limit=3 
         )
@@ -50,15 +41,9 @@ class EngineeringTeam():
             config=self.agents_config['test_engineer'],
             verbose=True,
             allow_code_execution=True,
+            code_execution_mode="safe",  # Uses Docker for safety
             max_execution_time=500, 
             max_retry_limit=3 
-        )
-
-    @agent
-    def documentation_engineer(self) -> Agent:
-        return Agent(
-            config=self.agents_config['documentation_engineer'],
-            verbose=True,
         )
 
     @task
@@ -71,35 +56,19 @@ class EngineeringTeam():
     def code_task(self) -> Task:
         return Task(
             config=self.tasks_config['code_task'],
-            output_pydantic=CodeOutput
         )
 
     @task
     def frontend_task(self) -> Task:
         return Task(
             config=self.tasks_config['frontend_task'],
-            output_pydantic=CodeOutput
         )
 
     @task
     def test_task(self) -> Task:
         return Task(
             config=self.tasks_config['test_task'],
-            output_pydantic=CodeOutput
         )   
-
-    @task
-    def documentation_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['documentation_task'],
-        )
-
-    @task
-    def requirements_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['requirements_task'],
-            output_pydantic=CodeOutput
-        )
 
     @crew
     def crew(self) -> Crew:
@@ -109,6 +78,4 @@ class EngineeringTeam():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            task_callback=self.task_callback,
-            step_callback=self.step_callback,
         )

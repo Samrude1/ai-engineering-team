@@ -282,10 +282,6 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
-def set_banking(): return "A lightweight banking showcase. Users can see a balance, make simple transfers, and view history. Keep it visual, simple, and clean for a quick user demo. Use Gradio 5+.", "banking.py", "Bank"
-def set_weather(): return "A lightweight weather showcase using Open-Meteo. Search by city name and show a clear 5-day forecast. Focus on a beautiful, minimal UI that works instantly. Use Gradio 5+.", "weather_app.py", "WeatherSystem"
-def set_trading(): return "A lightweight trading showcase. Simple limit/market orders and a clean portfolio view. Focus on the visual dashboard experience for users. Use Gradio 5+.", "investment.py", "PortfolioManager"
-
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
     with gr.Row():
@@ -296,23 +292,17 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
             reset_btn = gr.Button("Reset session", variant="secondary")
 
     with gr.Row():
-        with gr.Column(scale=3, min_width=300): # Fixed width for inputs to ensure right column gets space
+        with gr.Column(scale=3, min_width=300):
             with gr.Group():
-                gr.Markdown("<p style='font-size: 0.9em; color: #666; margin-bottom: 5px; padding-left: 5px;'><i>Quick Scenarios</i></p>")
-                with gr.Row():
-                    btn_bank = gr.Button("🏦 Banking", variant="secondary")
-                    btn_weather = gr.Button("🌦️ Weather", variant="secondary")
-                    btn_trading = gr.Button("📈 Trading", variant="secondary")
-                
                 reqs = gr.TextArea(
-                    label="Requirements", 
-                    placeholder="Describe your software...", 
-                    lines=8,
-                    value="A high-frequency trading simulation platform. Handle limit orders, market orders, and portfolio rebalancing."
+                    label="Product Requirements & Specification", 
+                    placeholder="Example: A Trading Simulation Platform.\n- Account management: Create, deposit, and withdraw funds.\n- Share trading: Buy/sell shares (e.g. AAPL, TSLA) with a get_share_price(symbol) logic.\n- Portfolio reporting: Calculate total value, profit/loss, and list holdings.\n- Constraints: Prevent negative balances and selling shares users don't own.\n- Modern UI: Gradio 5+ interface with a real-time dashboard view.", 
+                    lines=15,
+                    value=""
                 )
                 with gr.Row():
-                    mod_name = gr.Textbox(label="Module Name", placeholder="e.g. core.py", value="investment.py")
-                    cls_name = gr.Textbox(label="Class Name", placeholder="e.g. MyManager", value="PortfolioManager")
+                    mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="app.py")
+                    cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
                 
                 run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
@@ -339,11 +329,6 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                 with gr.TabItem("📖 README"):
                     readme_out = gr.Markdown("Waiting...", elem_classes=["tabitem"])
 
-    # Wire buttons
-    btn_bank.click(set_banking, [], [reqs, mod_name, cls_name])
-    btn_weather.click(set_weather, [], [reqs, mod_name, cls_name])
-    btn_trading.click(set_trading, [], [reqs, mod_name, cls_name])
-    
     run_btn.click(
         fn=solve_requirements_streaming,
         inputs=[reqs, mod_name, cls_name],
