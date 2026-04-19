@@ -12,9 +12,11 @@ code_task:
   description: >
     Implement the designed logic in a pure Python module ({module_name}).
     Ensure the class {class_name} is fully functional and follows the blueprint.
-    IMPORTANT: NO UI code, NO Gradio, and NO launch blocks allowed.
+    IMPORTANT: 
+    1. Include all necessary imports (e.g., 'import math', 'import json', 'import os') at the top.
+    2. NO UI code, NO Gradio, and NO launch blocks allowed.
   expected_output: >
-    A single Python file containing the robust business logic.
+    A single Python file containing the robust business logic with all required imports.
   agent: backend_engineer
   context:
     - design_task
