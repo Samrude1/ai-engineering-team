@@ -1,74 +1,53 @@
 design_task:
   description: >
-    Take the requirements and prepare an Engineering Blueprint in Markdown.
-    The goal is to design the BACKEND LOGIC and class structure.
-    IMPORTANT: Provide a structured report with headers. Do NOT write full Python code blocks here; only signatures.
-    Requirements: {requirements}
+    Analyze the requirements and create a technical blueprint in Markdown.
+    Define the class and method signatures needed for: {requirements}
+    Main Module: {module_name}, Primary Class: {class_name}
   expected_output: >
-    A clean, structured Markdown blueprint (no full code blocks).
+    A clear Markdown blueprint.
   agent: engineering_lead
 
 code_task:
   description: >
-    Implement the designed logic in a pure Python module ({module_name}).
-    Ensure the class {class_name} is fully functional and follows the blueprint.
-    IMPORTANT: 
-    1. Include all necessary imports (e.g., 'import math', 'import json', 'import os') at the top.
-    2. NO UI code, NO Gradio, and NO launch blocks allowed.
+    Implement the logic in {module_name}.
+    - Include all necessary imports at the top.
+    - Focus on the {class_name} functionality.
+    - Strictly logic only (no Gradio/UI).
   expected_output: >
-    A single Python file containing the robust business logic with all required imports.
+    A functional Python file ({module_name}).
   agent: backend_engineer
   context:
     - design_task
 
 frontend_task:
   description: >
-    Write a modern Gradio UI in app.py that demonstrates the backend.
-    IMPORTANT: You MUST 'from {module_name} import {class_name}' and use it.
-    MODERN GRADIO 5+ RULES:
-    1. Do NOT use 'readonly=True'. Use 'interactive=False' instead.
-    2. Use ONLY gr.Blocks for the layout.
-    3. Do NOT use deprecated gr.inputs or gr.outputs.
-    4. Ensure the UI is professional and demonstrates all features of the backend.
+    Create a Gradio UI in app.py.
+    - Import {class_name} from {module_name}.
+    - Use standard Gradio syntax to showcase the features.
   expected_output: >
-    A JSON object with 'code' and 'description' fields. The 'code' must contain the Gradio app.
+    A runnable app.py file.
   agent: frontend_engineer
   context:
     - code_task
 
 test_task:
   description: >
-    Write a unit test suite for {module_name} that verifies all core functionalities.
-    COMPULSORY:
-    1. Include all required imports (e.g., 'import unittest', 'import math', 'from {module_name} import {class_name}').
-    2. MATH VERIFICATION: Double-check all mathematical assertions against standard formulas. 
-    3. ROBUST MOCKING: Mock external APIs to handle success and error cases.
+    Write unit tests for {module_name}.
+    - Test the primary methods of {class_name}.
+    - Ensure basic edge cases are covered.
   expected_output: >
-    A runnable Python test file with all necessary imports.
+    A runnable test file.
   agent: test_engineer
   context:
     - code_task
 
 documentation_task:
   description: >
-    Write a user-friendly README.md with a clear "🚀 QUICK START" section.
-    The guide must describe how to run the software in simple steps.
+    Finalize the project with a professional README.md and requirements.txt.
+    - Documentation should be Windows-optimized (use 'python', not 'python3').
+    - requirements.txt should only include external libraries.
   expected_output: >
-    A professional README file in Markdown.
-  agent: documentation_engineer
-  context:
-    - code_task
-    - frontend_task
-
-requirements_task:
-  description: >
-    Create a complete requirements.txt file for the project.
-    IMPORTANT: 
-    1. Include ONLY external libraries (e.g., 'gradio>=5.0.0', 'requests', 'pandas').
-    2. DO NOT include Python standard libraries (e.g., 'math', 'os', 'json', 'sys', 'datetime', 'random', 'unittest'). 
-    Standard libraries are built-in and will cause pip install errors.
-  expected_output: >
-    A requirements.txt file with ONLY external dependencies.
+    A professional README.md and a clean requirements.txt.
   agent: documentation_engineer
   context:
     - code_task
