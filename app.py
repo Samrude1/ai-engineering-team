@@ -282,9 +282,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
-def set_banking(): return "A lightweight banking showcase. Users can see a balance, make simple transfers, and view history. Keep it visual, simple, and clean for a quick recruiter demo. Use Gradio 5+.", "banking.py", "Bank"
+def set_banking(): return "A lightweight banking showcase. Users can see a balance, make simple transfers, and view history. Keep it visual, simple, and clean for a quick user demo. Use Gradio 5+.", "banking.py", "Bank"
 def set_weather(): return "A lightweight weather showcase using Open-Meteo. Search by city name and show a clear 5-day forecast. Focus on a beautiful, minimal UI that works instantly. Use Gradio 5+.", "weather_app.py", "WeatherSystem"
-def set_trading(): return "A lightweight trading showcase. Simple limit/market orders and a clean portfolio view. Focus on the visual dashboard experience for recruiters. Use Gradio 5+.", "investment.py", "PortfolioManager"
+def set_trading(): return "A lightweight trading showcase. Simple limit/market orders and a clean portfolio view. Focus on the visual dashboard experience for users. Use Gradio 5+.", "investment.py", "PortfolioManager"
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
