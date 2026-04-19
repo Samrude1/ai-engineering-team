@@ -53,7 +53,7 @@ The team consists of four specialized AI agents collaborating in a sequential or
 | **Backend Engineer**  | Developer     | `claude-3-7-sonnet` | Implements the core logic following the lead's design.               |
 | **Frontend Engineer** | UI Expert     | `claude-3-7-sonnet` | Builds a Gradio interface to demonstrate the backend functionality.  |
 | **Test Engineer**     | QA            | `claude-3-7-sonnet` | Writes comprehensive unit tests to ensure reliability.               |
-| **Technical Writer**  | Documentation | `claude-3-7-sonnet` | Generates a professional README.md and user guide for the built app. |
+| **Technical Writer**  | Documentation | `gemini-2.0-flash`  | Generates a professional README.md and user guide for the built app. |
 
 ---
 
