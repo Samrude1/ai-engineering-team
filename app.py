@@ -28,6 +28,13 @@ TASK_LOG_MAP = {
 custom_css = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+}
+
 body, .gradio-container {
     font-family: 'Inter', -apple-system, sans-serif !important;
     background-color: #fdfdfd !important;
@@ -37,8 +44,9 @@ body, .gradio-container {
 .gradio-container {
     max-width: 1200px !important;
     margin: 0 auto !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    width: 100% !important;
 }
 
 /* Typography */
@@ -49,6 +57,34 @@ h1 {
     letter-spacing: -0.03em !important;
     margin-bottom: 0.2rem !important;
     font-size: 2.2rem !important;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.6rem !important;
+    }
+    .gradio-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    /* Force ALL rows to stack on mobile */
+    .gradio-container .row, 
+    .gradio-container .gap,
+    .gradio-container [class*="row-"] {
+        flex-direction: column !important;
+        flex-wrap: wrap !important;
+    }
+    /* Ensure columns and form elements take full width */
+    .gradio-container .column,
+    .gradio-container .form,
+    .gradio-container [class*="column-"],
+    .gradio-container .tabs {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
 }
 
 h2, h3 {
@@ -75,6 +111,7 @@ input:not([type="checkbox"]), textarea {
     transition: all 0.2s ease !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
     padding: 10px !important;
+    max-width: 100% !important;
 }
 
 input:focus, textarea:focus {
@@ -94,6 +131,13 @@ button.primary {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
     transition: all 0.2s ease !important;
     padding: 10px 20px !important;
+    width: 100% !important;
+}
+
+@media (min-width: 768px) {
+    button.primary {
+        width: auto !important;
+    }
 }
 
 button.primary:hover {
@@ -125,6 +169,7 @@ button.secondary:hover {
     white-space: pre-wrap !important;
     border-radius: 8px !important;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+    overflow-x: hidden !important;
 }
 
 /* Tabs */
@@ -155,6 +200,13 @@ div.tabs button.selected {
     box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
     overflow-x: auto !important;
 }
+
+@media (max-width: 768px) {
+    .tabitem {
+        padding: 10px !important;
+    }
+}
+
 """
 
 def solve_requirements_streaming(requirements, module_name, class_name, request: gr.Request):
@@ -318,7 +370,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
     with gr.Row():
-        with gr.Column(scale=8):
+        with gr.Column(scale=8, min_width=300):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
             gr.Markdown("*Full Software Development Automation for the Modern Enterprise.*")
         with gr.Column(scale=2, min_width=100):
@@ -349,7 +401,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
                     lines=12, interactive=False, elem_classes=["terminal-box"]
                 )
             
-        with gr.Column(scale=7): # Larger scale for output content
+        with gr.Column(scale=7, min_width=300): # Larger scale for output content
             with gr.Tabs():
                 with gr.TabItem("📋 Architecture"):
                     design_out = gr.Markdown("Waiting...", elem_classes=["tabitem"])
