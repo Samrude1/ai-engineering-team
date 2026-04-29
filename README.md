@@ -53,7 +53,7 @@ The team consists of four specialized AI agents collaborating in a sequential or
 | **Backend Engineer**  | Developer     | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Implements core logic following the lead's design.        |
 | **Frontend Engineer** | UI Expert     | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Builds a Gradio interface to demo the backend.            |
 | **Test Engineer**     | QA            | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Writes comprehensive unit tests to ensure reliability.    |
-| **Technical Writer**  | Documentation | `gemini-2.0-flash` (or `WRITER_MODEL`)    | Generates professional README and project metadata.       |
+| **Technical Writer**  | Documentation | `gemini-3-flash` (or `WRITER_MODEL`)    | Generates professional README and project metadata.       |
 
 ---
 
@@ -99,7 +99,7 @@ This project follows **DevSecOps best practices** to ensure a safe environment f
    # Optional: Override default models (useful if credits are low)
    LEAD_MODEL=openrouter/openai/gpt-4o
    ENGINEER_MODEL=openrouter/anthropic/claude-3.7-sonnet
-   WRITER_MODEL=openrouter/google/gemini-2.0-flash-001
+   WRITER_MODEL=openrouter/google/gemini-3-flash
    ```
 4. **Run Web UI**:
    ```bash
