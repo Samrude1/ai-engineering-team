@@ -25,6 +25,7 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['engineering_lead'],
             verbose=True,
+            allow_code_execution=False
         )
 
     @agent
@@ -42,6 +43,7 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['frontend_engineer'],
             verbose=True,
+            allow_code_execution=False
         )
     
     @agent
@@ -59,6 +61,7 @@ class EngineeringTeam():
         return Agent(
             config=self.agents_config['documentation_engineer'],
             verbose=True,
+            allow_code_execution=False
         )
 
     @task

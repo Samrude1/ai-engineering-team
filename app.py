@@ -220,6 +220,14 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         yield ("⚠️ Please enter your requirements.", "", "", "", "", "", "Input Error: Empty requirements.", gr.update(visible=False))
         return
 
+    # Security: Sanitize inputs to prevent path traversal and injection
+    module_name = os.path.basename(module_name)
+    class_name = "".join(c for c in class_name if c.isalnum() or c in ("_", "-"))
+    
+    # Enforce safe file extensions for module name
+    if not module_name.endswith('.py'):
+        module_name += '.py'
+
     cleanup_output('output')
     IP_USAGE[client_ip] += 1
     log_queue = queue.Queue()
