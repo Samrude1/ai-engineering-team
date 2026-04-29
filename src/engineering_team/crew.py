@@ -1,6 +1,7 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from pydantic import BaseModel, Field
+import os
 
 
 class CodeOutput(BaseModel):
@@ -19,11 +20,27 @@ class EngineeringTeam():
     def __init__(self, task_callback=None, step_callback=None):
         self.task_callback = task_callback
         self.step_callback = step_callback
+        
+        # Initialize LLMs with explicit max_tokens to prevent OpenRouter credit/limit errors
+        # Using 4000 tokens as a safe upper bound for complex engineering tasks
+        self.lead_llm = LLM(
+            model=os.getenv("LEAD_MODEL", "openrouter/openai/gpt-4o"),
+            max_tokens=4000
+        )
+        self.engineer_llm = LLM(
+            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-3.7-sonnet"),
+            max_tokens=4000
+        )
+        self.writer_llm = LLM(
+            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-2.0-flash-001"),
+            max_tokens=4000
+        )
 
     @agent
     def engineering_lead(self) -> Agent:
         return Agent(
             config=self.agents_config['engineering_lead'],
+            llm=self.lead_llm,
             verbose=True,
             allow_code_execution=False
         )
@@ -32,6 +49,7 @@ class EngineeringTeam():
     def backend_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['backend_engineer'],
+            llm=self.engineer_llm,
             verbose=True,
             allow_code_execution=False,
             max_execution_time=500, 
@@ -42,6 +60,7 @@ class EngineeringTeam():
     def frontend_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['frontend_engineer'],
+            llm=self.engineer_llm,
             verbose=True,
             allow_code_execution=False
         )
@@ -50,6 +69,7 @@ class EngineeringTeam():
     def test_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['test_engineer'],
+            llm=self.engineer_llm,
             verbose=True,
             allow_code_execution=False,
             max_execution_time=500, 
@@ -60,6 +80,7 @@ class EngineeringTeam():
     def documentation_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['documentation_engineer'],
+            llm=self.writer_llm,
             verbose=True,
             allow_code_execution=False
         )
