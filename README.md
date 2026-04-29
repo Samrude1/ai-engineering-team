@@ -73,13 +73,15 @@ graph TD
 
 ---
 
-## 🔒 Usage Limits & Security
+## 🔒 Security & Usage Limits
 
-To ensure a high-quality experience for all visitors and protect the project budget, the following limits are in place:
+This project follows **DevSecOps best practices** to ensure a safe environment for automated code generation:
 
-- **Rate Limiting**: 15 full generation runs per IP address.
-- **Input Limit**: Requirements description is limited to 2000 characters.
-- **Concurrency**: The system handles one generation at a time via a queuing system.
+- **Path Sanitization**: All user-provided module and class names are sanitized using strict regex and `os.path.basename` to prevent directory traversal attacks.
+- **Agent Sandbox Policy**: All agents have `allow_code_execution=False` enforced by default. The system produces code but never executes it on the host environment.
+- **Rate Limiting**: 15 full generation runs per IP address to protect against API abuse.
+- **Concurrency Control**: A FIFO queuing system ensures stable performance and prevents resource exhaustion.
+- **Environment Isolation**: No sensitive credentials are ever exposed or stored within the generated project structure.
 
 ---
 
