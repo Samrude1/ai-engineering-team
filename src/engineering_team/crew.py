@@ -24,15 +24,15 @@ class EngineeringTeam():
         # Initialize LLMs with explicit max_tokens to prevent OpenRouter credit/limit errors
         # Using 4000 tokens as a safe upper bound for complex engineering tasks
         self.lead_llm = LLM(
-            model=os.getenv("LEAD_MODEL", "openrouter/openai/gpt-4o"),
+            model=os.getenv("LEAD_MODEL", "openrouter/openai/gpt-5.5"),
             max_tokens=4000
         )
         self.engineer_llm = LLM(
-            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-3.7-sonnet"),
+            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-latest"),
             max_tokens=4000
         )
         self.writer_llm = LLM(
-            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-3-flash-preview"),
+            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-flash-latest"),
             max_tokens=4000
         )
 

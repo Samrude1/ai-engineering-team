@@ -49,11 +49,11 @@ The team consists of four specialized AI agents collaborating in a sequential or
 
 | Agent                 | Role          | Model               | Description                                                          |
 | --------------------- | ------------- | ------------------- | -------------------------------------------------------------------- |
-| **Engineering Lead**  | Architect     | `gpt-4o` (or `LEAD_MODEL`)            | Analyzes requirements and prepares architecture design.   |
-| **Backend Engineer**  | Developer     | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Implements core logic following the lead's design.        |
-| **Frontend Engineer** | UI Expert     | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Builds a Gradio interface to demo the backend.            |
-| **Test Engineer**     | QA            | `claude-3-7-sonnet` (or `ENGINEER_MODEL`) | Writes comprehensive unit tests to ensure reliability.    |
-| **Technical Writer**  | Documentation | `gemini-3-flash` (or `WRITER_MODEL`)    | Generates professional README and project metadata.       |
+| **Engineering Lead**  | Architect     | `gpt-5.5` (or `LEAD_MODEL`)            | Analyzes requirements and prepares architecture design.   |
+| **Backend Engineer**  | Developer     | `claude-sonnet-latest` (or `ENGINEER_MODEL`) | Implements core logic following the lead's design.        |
+| **Frontend Engineer** | UI Expert     | `claude-sonnet-latest` (or `ENGINEER_MODEL`) | Builds a Gradio interface to demo the backend.            |
+| **Test Engineer**     | QA            | `claude-sonnet-latest` (or `ENGINEER_MODEL`) | Writes comprehensive unit tests to ensure reliability.    |
+| **Technical Writer**  | Documentation | `gemini-flash-latest` (or `WRITER_MODEL`)    | Generates professional README and project metadata.       |
 
 ---
 
@@ -97,9 +97,9 @@ This project follows **DevSecOps best practices** to ensure a safe environment f
    ```env
    OPENROUTER_API_KEY=sk-or-v1-...
    # Optional: Override default models (useful if credits are low)
-   LEAD_MODEL=openrouter/openai/gpt-4o
-   ENGINEER_MODEL=openrouter/anthropic/claude-3.7-sonnet
-   WRITER_MODEL=openrouter/google/gemini-3-flash
+   LEAD_MODEL=openrouter/openai/gpt-5.5
+   ENGINEER_MODEL=openrouter/anthropic/claude-sonnet-latest
+   WRITER_MODEL=openrouter/google/gemini-flash-latest
    ```
 4. **Run Web UI**:
    ```bash
