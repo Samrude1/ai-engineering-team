@@ -32,7 +32,7 @@ class EngineeringTeam():
             max_tokens=2000
         )
         self.writer_llm = LLM(
-            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-3.1-flash"),
+            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-2.5-flash"),
             max_tokens=2000
         )
 
