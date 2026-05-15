@@ -25,15 +25,15 @@ class EngineeringTeam():
         # Using 4000 tokens as a safe upper bound for complex engineering tasks
         self.lead_llm = LLM(
             model=os.getenv("LEAD_MODEL", "openrouter/openai/gpt-5.5"),
-            max_tokens=4000
+            max_tokens=2000
         )
         self.engineer_llm = LLM(
             model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-4.6"),
-            max_tokens=4000
+            max_tokens=2000
         )
         self.writer_llm = LLM(
             model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-3.1-flash"),
-            max_tokens=4000
+            max_tokens=2000
         )
 
     @agent
