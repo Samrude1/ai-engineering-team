@@ -28,11 +28,11 @@ class EngineeringTeam():
             max_tokens=4000
         )
         self.engineer_llm = LLM(
-            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-latest"),
+            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-4.6"),
             max_tokens=4000
         )
         self.writer_llm = LLM(
-            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-flash-latest"),
+            model=os.getenv("WRITER_MODEL", "openrouter/google/gemini-3.1-flash"),
             max_tokens=4000
         )
 
