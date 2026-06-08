@@ -381,6 +381,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
         with gr.Column(scale=8, min_width=300):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
             gr.Markdown("*Full Software Development Automation for the Modern Enterprise.*")
+            gr.Markdown("> ⚠️ **Demo Notice:** This portfolio project is currently powered by a free LLM (`google/gemma-4-31b-it:free`) to remain accessible. Generations may be slower during peak hours, and upstream rate limits might occasionally occur. Thank you for your patience!")
         with gr.Column(scale=2, min_width=100):
             reset_btn = gr.Button("Reset session", variant="secondary")
 
