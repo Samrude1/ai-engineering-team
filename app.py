@@ -26,8 +26,6 @@ TASK_LOG_MAP = {
 
 # Custom CSS for the Professional Minimalist 'Zinc' Theme (Matching Sidekick)
 custom_css = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 body {
     margin: 0 !important;
     padding: 0 !important;
@@ -79,9 +77,13 @@ div[class*="block"] {
 
 .prose th { background-color: #f8fafc !important; }
 
-.file-preview, .file-wrap, [data-testid="file-upload"] {
-    background-color: #ffffff !important;
-    color: #111111 !important;
+.file-preview, .file-wrap, [data-testid="file-upload"], .download {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    border: 1px solid #111111 !important;
+}
+.file-preview * {
+    color: #ffffff !important;
 }
 
 /* Fix dark background overriding our light layout (Globally force light variables) */
@@ -438,7 +440,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
 # Build UI
-with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css=custom_css, title="Engineering Team | Enterprise") as demo:
+with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "sans-serif"]), css=custom_css, title="Engineering Team | Enterprise") as demo:
     with gr.Row():
         with gr.Column(scale=8, min_width=300):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
