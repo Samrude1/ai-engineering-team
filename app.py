@@ -59,6 +59,38 @@ div[class*="block"] {
     box-shadow: none !important;
 }
 
+/* Force light backgrounds for Code, Markdown, Tables, and Files */
+.cm-editor, .cm-scroller, .cm-content, .cm-gutters, .codemirror-wrapper {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+}
+
+.prose pre, .prose code, pre code, code {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.prose table, .prose th, .prose td {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.prose th { background-color: #f8fafc !important; }
+
+.file-preview, .file-wrap, [data-testid="file-upload"] {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+}
+
+/* Fix dark background overriding our light layout */
+.gradio-container {
+    --background-fill-primary: #ffffff !important;
+    --background-fill-secondary: #f8fafc !important;
+    --block-background-fill: #ffffff !important;
+}
+
 /* Typography */
 h1 {
     font-family: 'Inter', sans-serif !important;
