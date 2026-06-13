@@ -97,9 +97,9 @@ This project follows **DevSecOps best practices** to ensure a safe environment f
    ```env
    OPENROUTER_API_KEY=sk-or-v1-...
    # AI Dream Team Configuration
-   LEAD_MODEL=anthropic/claude-opus-4.5
-   ENGINEER_MODEL=anthropic/claude-sonnet-4.5
-   WRITER_MODEL=openai/gpt-4o
+   LEAD_MODEL=openrouter/anthropic/claude-opus-4.5
+   ENGINEER_MODEL=openrouter/anthropic/claude-sonnet-4.5
+   WRITER_MODEL=openrouter/openai/gpt-4o
    ```
 4. **Run Web UI**:
    ```bash
