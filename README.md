@@ -25,7 +25,7 @@ The AI Engineering Team is a production-grade multi-agent orchestration system b
 > "A full-stack engineering team that delivers tested, documented, and demo-ready Python applications in under 10 minutes."
 
 - **Narrative**: Zero-to-one software development automation.
-- **Tech Stack**: CrewAI, GPT-4o (Full Team), Gradio 5.
+- **Tech Stack**: CrewAI, Claude 4.5 & GPT-4o, Gradio 5.
 - **Output**: Complete Python backend, Gradio UI, and Pytest suite.
 
 ---
