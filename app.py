@@ -49,6 +49,16 @@ body, .gradio-container {
     width: 100% !important;
 }
 
+/* Fix for dark block backgrounds in Gradio 5 */
+.gradio-container .block, 
+.gradio-container .form, 
+.gradio-container .panel,
+div[class*="block"] {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
 /* Typography */
 h1 {
     font-family: 'Inter', sans-serif !important;
