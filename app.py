@@ -381,34 +381,32 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc"), css
         with gr.Column(scale=8, min_width=300):
             gr.Markdown("# ⚡ AI Engineering Team (Enterprise Edition)")
             gr.Markdown("*Full Software Development Automation for the Modern Enterprise.*")
-            gr.Markdown("> 🚀 **Powered by the AI Dream Team:** `claude-opus-4.5` (Lead), `claude-sonnet-4.5` (Engineers), and `gpt-4o` (Documentation). Ready for enterprise-grade autonomous engineering.")
+            gr.HTML("<div style='padding: 10px 15px; border-radius: 6px; background: linear-gradient(90deg, #f8fafc, #f1f5f9); border: 1px solid #e2e8f0; color: #475569; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;'>✨ <strong style='color: #0f172a;'>Powered by the AI Dream Team:</strong> Claude Opus 4.5, Claude Sonnet 4.5, and GPT-4o.</div>")
         with gr.Column(scale=2, min_width=100):
             reset_btn = gr.Button("Reset session", variant="secondary")
 
     with gr.Row():
         with gr.Column(scale=3, min_width=300):
-            with gr.Group():
-                reqs = gr.TextArea(
-                    label="Product Requirements & Specification", 
-                    placeholder="Example: A Trading Simulation Platform.\n- Account management: Create, deposit, and withdraw funds.\n- Share trading: Buy/sell shares (e.g. AAPL, TSLA) with a get_share_price(symbol) logic.\n- Portfolio reporting: Calculate total value, profit/loss, and list holdings.\n- Constraints: Prevent negative balances and selling shares users don't own.\n- Modern UI: Gradio 5+ interface with a real-time dashboard view.", 
-                    lines=15,
-                    value=""
-                )
-                with gr.Row():
-                    mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="logic.py")
-                    cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
-                
-                run_btn = gr.Button("Execute Engineering Task", variant="primary")
+            reqs = gr.TextArea(
+                label="Product Requirements & Specification", 
+                placeholder="Example: A Trading Simulation Platform.\n- Account management: Create, deposit, and withdraw funds.\n- Share trading: Buy/sell shares (e.g. AAPL, TSLA) with a get_share_price(symbol) logic.\n- Portfolio reporting: Calculate total value, profit/loss, and list holdings.\n- Constraints: Prevent negative balances and selling shares users don't own.\n- Modern UI: Gradio 5+ interface with a real-time dashboard view.", 
+                lines=15,
+                value=""
+            )
+            with gr.Row():
+                mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="logic.py")
+                cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
+            
+            run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
             status = gr.Markdown("Ready to engineer.")
             download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
             
-            with gr.Group():
-                terminal_log = gr.TextArea(
-                    label="Engineering Logs",
-                    placeholder="Team activity logs...",
-                    lines=12, interactive=False, elem_classes=["terminal-box"]
-                )
+            terminal_log = gr.TextArea(
+                label="Engineering Logs",
+                placeholder="Team activity logs...",
+                lines=12, interactive=False, elem_classes=["terminal-box"]
+            )
             
         with gr.Column(scale=7, min_width=300): # Larger scale for output content
             with gr.Tabs():
