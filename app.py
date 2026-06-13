@@ -84,11 +84,31 @@ div[class*="block"] {
     color: #111111 !important;
 }
 
-/* Fix dark background overriding our light layout */
-.gradio-container {
+/* Fix dark background overriding our light layout (Globally force light variables) */
+.gradio-container, .dark, body.dark {
     --background-fill-primary: #ffffff !important;
     --background-fill-secondary: #f8fafc !important;
     --block-background-fill: #ffffff !important;
+    --block-label-background-fill: #f1f5f9 !important;
+    --block-label-text-color: #475569 !important;
+    --body-text-color: #1a1a1a !important;
+    --button-secondary-background-fill: #ffffff !important;
+    --button-secondary-text-color: #1a1a1a !important;
+    --border-color-primary: #e2e8f0 !important;
+    --border-color-secondary: #cbd5e1 !important;
+    --code-background-fill: #ffffff !important;
+    --panel-background-fill: #ffffff !important;
+    color-scheme: light !important;
+}
+
+/* Bruteforce for the specific Code header and File boxes */
+.gradio-container .label, 
+.gradio-container span[class*="label"],
+.gradio-container .file-preview,
+.gradio-container .file-wrap,
+.gradio-container .download {
+    background-color: transparent !important;
+    color: #1a1a1a !important;
 }
 
 /* Typography */
