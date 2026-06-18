@@ -488,13 +488,19 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font
                 cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
             
             with gr.Accordion("⚙️ AI Models & Settings", open=False):
+                model_choices = [
+                    ("Claude 4.5 Opus", "openrouter/anthropic/claude-opus-4.5"),
+                    ("Claude 4.5 Sonnet", "openrouter/anthropic/claude-sonnet-4.5"),
+                    ("GPT-4o", "openrouter/openai/gpt-4o"),
+                    ("Claude 3 Haiku", "openrouter/anthropic/claude-3-haiku")
+                ]
                 lead_model = gr.Dropdown(
-                    choices=["openrouter/anthropic/claude-opus-4.5", "openrouter/anthropic/claude-sonnet-4.5", "openrouter/openai/gpt-4o", "openrouter/anthropic/claude-3-haiku"], 
+                    choices=model_choices, 
                     value="openrouter/anthropic/claude-opus-4.5", 
                     label="Lead Architect Model"
                 )
                 engineer_model = gr.Dropdown(
-                    choices=["openrouter/anthropic/claude-sonnet-4.5", "openrouter/openai/gpt-4o", "openrouter/anthropic/claude-3-haiku", "openrouter/anthropic/claude-opus-4.5"], 
+                    choices=model_choices, 
                     value="openrouter/anthropic/claude-sonnet-4.5", 
                     label="Engineer Model"
                 )
