@@ -2,6 +2,7 @@ import shutil
 import os
 import re
 import zipfile
+import time
 from datetime import datetime
 
 def strip_markdown_from_python(file_path: str):
@@ -85,36 +86,43 @@ def create_project_zip(output_dir='output', zip_name_prefix='engineering_project
         return None
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    # e.g., ai_engineered_accounts_20260415_190000.zip
     clean_prefix = zip_name_prefix.replace('.py', '').replace(' ', '_').lower()
     zip_filename = f"ai_engineered_{clean_prefix}_{timestamp}.zip"
-    zip_path = os.path.join(os.path.dirname(os.path.abspath(output_dir)), zip_filename)
+    
+    # Store the zip in the parent of output_dir (e.g. 'output' if output_dir is 'output/uuid')
+    # If output_dir is 'output/uuid', parent is 'output'
+    parent_dir = os.path.dirname(os.path.abspath(output_dir))
+    zip_path = os.path.join(parent_dir, zip_filename)
     
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk(output_dir):
             for file in files:
                 file_path = os.path.join(root, file)
-                # Store files relative to output_dir
                 zipf.write(file_path, os.path.relpath(file_path, output_dir))
     
     return zip_path
 
 
-def cleanup_output(output_dir='output'):
+def cleanup_old_sessions(output_base='output', max_age_hours=1):
     """
-    Cleans up the output directory AND deletes any old ZIP files starting with 'ai_engineered_'.
-    This is critical for long-running processes (like Hugging Face Spaces) to prevent disk bloat.
+    Cleans up subdirectories inside output_base and old ZIP files that are older than max_age_hours.
+    This ensures concurrent sessions don't conflict, and disk space is freed up over time.
     """
-    # 1. Clean the output folder
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir, exist_ok=True)
+    if not os.path.exists(output_base):
+        os.makedirs(output_base, exist_ok=True)
+        return
 
-    # 2. Clean old ZIP files in the root/current directory
-    base_dir = os.path.dirname(os.path.abspath(output_dir))
-    for item in os.listdir(base_dir):
-        if item.endswith('.zip') and item.startswith('ai_engineered_'):
-            try:
-                os.remove(os.path.join(base_dir, item))
-            except Exception:
-                pass
+    now = time.time()
+    for item in os.listdir(output_base):
+        item_path = os.path.join(output_base, item)
+        # Skip if it's too new
+        if os.path.getmtime(item_path) > now - (max_age_hours * 3600):
+            continue
+            
+        try:
+            if os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+            elif item.endswith('.zip') and item.startswith('ai_engineered_'):
+                os.remove(item_path)
+        except Exception:
+            pass

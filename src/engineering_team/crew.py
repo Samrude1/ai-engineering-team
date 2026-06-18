@@ -17,18 +17,18 @@ class EngineeringTeam():
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
-    def __init__(self, task_callback=None, step_callback=None):
+    def __init__(self, task_callback=None, step_callback=None, lead_model=None, engineer_model=None):
         self.task_callback = task_callback
         self.step_callback = step_callback
         
         # Initialize LLMs with explicit max_tokens to prevent OpenRouter credit/limit errors
         # Using 4000 tokens as a safe upper bound for complex engineering tasks
         self.lead_llm = LLM(
-            model=os.getenv("LEAD_MODEL", "openrouter/anthropic/claude-opus-4.5"),
+            model=lead_model or os.getenv("LEAD_MODEL", "openrouter/anthropic/claude-opus-4.5"),
             max_tokens=2000
         )
         self.engineer_llm = LLM(
-            model=os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-4.5"),
+            model=engineer_model or os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-4.5"),
             max_tokens=2000
         )
         self.writer_llm = LLM(

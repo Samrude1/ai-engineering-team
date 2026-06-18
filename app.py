@@ -1,3 +1,4 @@
+import uuid
 import gradio as gr
 import os
 import sys
@@ -9,7 +10,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from engineering_team.crew import EngineeringTeam
-from engineering_team.utils import create_project_zip, cleanup_output, sanitize_all_outputs, strip_markdown_from_python
+from engineering_team.utils import create_project_zip, cleanup_old_sessions, sanitize_all_outputs, strip_markdown_from_python
 
 # Rate Limiting Tracker
 IP_USAGE = {}
@@ -273,7 +274,7 @@ div.tabs button.selected {
 
 """
 
-def solve_requirements_streaming(requirements, module_name, class_name, request: gr.Request):
+def solve_requirements_streaming(requirements, module_name, class_name, lead_model_choice, engineer_model_choice, request: gr.Request):
     client_ip = request.client.host if request else "unknown"
     if client_ip not in IP_USAGE: IP_USAGE[client_ip] = 0
     if IP_USAGE[client_ip] >= MAX_REQUESTS_PER_IP:
@@ -292,10 +293,13 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     if not module_name.endswith('.py'):
         module_name += '.py'
 
-    cleanup_output('output')
+    cleanup_old_sessions('output')
     IP_USAGE[client_ip] += 1
     log_queue = queue.Queue()
-    os.makedirs('output', exist_ok=True)
+    
+    session_id = str(uuid.uuid4())
+    output_dir = os.path.join('output', session_id)
+    os.makedirs(output_dir, exist_ok=True)
     
     result_container = {"success": False, "data": None, "error": None, "done": False, "task_index": 0}
     
@@ -307,25 +311,47 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
         target_file = None
         current_task_type = None
         
-        # Mapping by sequential index (1-based)
-        if idx == 1: # design_task
+        description = (task_output.description.lower() if hasattr(task_output, 'description') else "").strip()
+        
+        # Robust Mapping by Description
+        if "blueprint" in description or "design" in description:
             current_task_type = "design_task"
-            target_file = os.path.join("output", f"{module_name}_design.md")
-        elif idx == 2: # code_task
+            target_file = os.path.join(output_dir, f"{module_name}_design.md")
+        elif "implement the logic" in description or ("logic" in description and "gradio" not in description):
             current_task_type = "code_task"
-            target_file = os.path.join("output", module_name)
-        elif idx == 3: # frontend_task
+            target_file = os.path.join(output_dir, module_name)
+        elif "gradio ui" in description:
             current_task_type = "frontend_task"
-            target_file = os.path.join("output", "app.py")
-        elif idx == 4: # test_task
+            target_file = os.path.join(output_dir, "app.py")
+        elif "unit test" in description or "test_task" in description:
             current_task_type = "test_task"
-            target_file = os.path.join("output", f"test_{module_name}")
-        elif idx == 5: # documentation_task
+            target_file = os.path.join(output_dir, f"test_{module_name}")
+        elif "readme.md" in description or "documentation" in description:
             current_task_type = "documentation_task"
-            target_file = os.path.join("output", "README.md")
-        elif idx == 6: # requirements_task
+            target_file = os.path.join(output_dir, "README.md")
+        elif "requirements.txt" in description:
             current_task_type = "requirements_task"
-            target_file = os.path.join("output", "requirements.txt")
+            target_file = os.path.join(output_dir, "requirements.txt")
+        else:
+            # Fallback to index if description matching fails
+            if idx == 1:
+                current_task_type = "design_task"
+                target_file = os.path.join(output_dir, f"{module_name}_design.md")
+            elif idx == 2:
+                current_task_type = "code_task"
+                target_file = os.path.join(output_dir, module_name)
+            elif idx == 3:
+                current_task_type = "frontend_task"
+                target_file = os.path.join(output_dir, "app.py")
+            elif idx == 4:
+                current_task_type = "test_task"
+                target_file = os.path.join(output_dir, f"test_{module_name}")
+            elif idx == 5:
+                current_task_type = "documentation_task"
+                target_file = os.path.join(output_dir, "README.md")
+            elif idx == 6:
+                current_task_type = "requirements_task"
+                target_file = os.path.join(output_dir, "requirements.txt")
 
         if target_file:
             try:
@@ -344,8 +370,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
                     if "requests" not in content.lower(): content += "\nrequests"
                     
                     # Remove standard libraries that AI often incorrectly includes
-                    std_libs = ["math", "os", "sys", "json", "datetime", "random", "re", "time", "unittest", "logging"]
-                    content = "\n".join([l for l in content.split("\n") if l.strip().lower() not in std_libs])
+                    std_libs = getattr(sys, 'stdlib_module_names', set(["math", "os", "sys", "json", "datetime", "random", "re", "time", "unittest", "logging"]))
+                    content = "\n".join([l for l in content.split("\n") if l.strip().split("=")[0].split(">")[0].split("<")[0].lower() not in std_libs])
                 
                 with open(target_file, "w", encoding="utf-8") as f:
                     f.write(content)
@@ -398,7 +424,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
     
     def run_crew():
         try:
-            crew_obj = EngineeringTeam(task_callback=log_task, step_callback=log_step).crew()
+            crew_obj = EngineeringTeam(task_callback=log_task, step_callback=log_step, lead_model=lead_model_choice, engineer_model=engineer_model_choice).crew()
             result_container["data"] = crew_obj.kickoff(inputs=inputs)
             result_container["success"] = True
         except Exception as e: result_container["error"] = str(e)
@@ -422,16 +448,16 @@ def solve_requirements_streaming(requirements, module_name, class_name, request:
 
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
-        sanitize_all_outputs('output', module_name)
+        sanitize_all_outputs(output_dir, module_name)
         def read_file(path): return open(path, 'r', encoding='utf-8').read() if os.path.exists(path) else ""
-        zip_path = create_project_zip('output', zip_name_prefix=module_name.split('.')[0])
+        zip_path = create_project_zip(output_dir, zip_name_prefix=module_name.split('.')[0])
         yield (
             "✅ All projects generated!",
-            read_file(f"output/{module_name}_design.md"),
-            read_file(f"output/{module_name}"),
-            read_file("output/app.py"),
-            read_file(f"output/test_{module_name}"),
-            read_file("output/README.md"),
+            read_file(f"{output_dir}/{module_name}_design.md"),
+            read_file(f"{output_dir}/{module_name}"),
+            read_file(f"{output_dir}/app.py"),
+            read_file(f"{output_dir}/test_{module_name}"),
+            read_file(f"{output_dir}/README.md"),
             current_logs,
             gr.update(value=zip_path, visible=True)
         )
@@ -461,6 +487,18 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font
                 mod_name = gr.Textbox(label="Main Module Name", placeholder="e.g. engine.py", value="logic.py")
                 cls_name = gr.Textbox(label="Primary Class Name", placeholder="e.g. ProjectManager", value="System")
             
+            with gr.Accordion("⚙️ AI Models & Settings", open=False):
+                lead_model = gr.Dropdown(
+                    choices=["openrouter/anthropic/claude-opus-4.5", "openrouter/anthropic/claude-sonnet-4.5", "openrouter/openai/gpt-4o", "openrouter/anthropic/claude-3-haiku"], 
+                    value="openrouter/anthropic/claude-opus-4.5", 
+                    label="Lead Architect Model"
+                )
+                engineer_model = gr.Dropdown(
+                    choices=["openrouter/anthropic/claude-sonnet-4.5", "openrouter/openai/gpt-4o", "openrouter/anthropic/claude-3-haiku", "openrouter/anthropic/claude-opus-4.5"], 
+                    value="openrouter/anthropic/claude-sonnet-4.5", 
+                    label="Engineer Model"
+                )
+            
             run_btn = gr.Button("Execute Engineering Task", variant="primary")
             
             status = gr.Markdown("Ready to engineer.")
@@ -487,7 +525,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font
 
     run_btn.click(
         fn=solve_requirements_streaming,
-        inputs=[reqs, mod_name, cls_name],
+        inputs=[reqs, mod_name, cls_name, lead_model, engineer_model],
         outputs=[status, design_out, code_out, app_out, test_out, readme_out, terminal_log, download_btn]
     )
     
