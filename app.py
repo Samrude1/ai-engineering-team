@@ -317,21 +317,21 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         if "blueprint" in description or "design" in description:
             current_task_type = "design_task"
             target_file = os.path.join(output_dir, f"{module_name}_design.md")
-        elif "implement the logic" in description or ("logic" in description and "gradio" not in description):
-            current_task_type = "code_task"
-            target_file = os.path.join(output_dir, module_name)
-        elif "gradio ui" in description:
-            current_task_type = "frontend_task"
-            target_file = os.path.join(output_dir, "app.py")
         elif "unit test" in description or "test_task" in description:
             current_task_type = "test_task"
             target_file = os.path.join(output_dir, f"test_{module_name}")
+        elif "gradio ui" in description:
+            current_task_type = "frontend_task"
+            target_file = os.path.join(output_dir, "app.py")
         elif "readme.md" in description or "documentation" in description:
             current_task_type = "documentation_task"
             target_file = os.path.join(output_dir, "README.md")
         elif "requirements.txt" in description:
             current_task_type = "requirements_task"
             target_file = os.path.join(output_dir, "requirements.txt")
+        elif "implement the logic" in description or ("logic" in description and "gradio" not in description):
+            current_task_type = "code_task"
+            target_file = os.path.join(output_dir, module_name)
         else:
             # Fallback to index if description matching fails
             if idx == 1:
