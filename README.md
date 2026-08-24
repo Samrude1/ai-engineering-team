@@ -25,27 +25,57 @@ The AI Engineering Team is a production-grade multi-agent orchestration system b
 > "A full-stack engineering team that delivers tested, documented, and demo-ready Python applications in under 10 minutes."
 
 - **Narrative**: Zero-to-one software development automation.
-- **Tech Stack**: CrewAI, Claude 4.5 & GPT-4o, Gradio 5.
-- **Output**: Complete Python backend, Gradio UI, and Pytest suite.
+- **Tech Stack**: CrewAI, Python 3.10+, Anthropic Claude 4.5 & OpenAI GPT-4o, Gradio 5+.
+- **Output**: Complete Python backend module, interactive Gradio UI prototype, and unit test suite.
 
 ---
 
-To get the most out of the **Version 2.0** Engineering Team, provide detailed, multi-step requirements. 
+## 📂 Project Structure
 
-### 🚀 Professional Case: Personal Expense Tracker
-> "Create a robust Personal Expense Tracking system to manage a monthly budget.
-> - The system should allow users to add income and record expenses with a specific category (e.g., Housing, Food, Fun).
-> - The system should calculate the current balance and show a summary of spending by category.
-> - The system should track a 'Monthly Budget Limit' and return a warning if an expense exceeds the remaining budget.
-> - The system should be able to report all transactions in a chronological list and calculate the total savings rate (%) at any point.
-> - **Business Rules**: Prevent the user from recording an expense if the balance is zero (unless credit is allowed). Ensure all transactions have a timestamp.
-> - **Logic**: Include a method to suggest a 'Savings Goal' based on current spending patterns (e.g., if total fun spending > 30%, suggest a 5% reduction)."
+```
+engineering_team/
+├── app.py                      # Main Gradio 5 web interface & streaming logs
+├── sample_showcase/            # Pre-generated zero-wait sample project showcase
+│   ├── accounts_design.md      # Sample architectural blueprint
+│   ├── accounts.py             # Sample backend logic & ledger
+│   ├── app.py                  # Sample Gradio UI demo
+│   ├── test_accounts.py        # Sample unit tests
+│   └── README.md               # Sample documentation
+├── src/
+│   └── engineering_team/
+│       ├── __init__.py
+│       ├── crew.py             # CrewAI multi-agent definition & orchestration
+│       ├── main.py             # CLI entrypoint for local execution
+│       ├── utils.py            # SuperSanitizer, session cleaner, & ZIP packager
+│       ├── config/
+│       │   ├── agents.yaml     # Agent roles, goals, and backstories
+│       │   └── tasks.yaml      # Sequential task definitions & contracts
+│       └── tools/
+│           └── custom_tool.py  # Extensible custom tools for crew agents
+├── .agents/                    # Architecture, context, workflows, & agent rules
+├── output/                     # Ephemeral workspace directories for runs
+├── pyproject.toml              # UV / Hatchling project metadata & dependencies
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
+```
+
+---
+
+## 💡 Tech Stack
+
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Agent Orchestration** | [CrewAI](https://crewai.com) | Sequential multi-agent pipeline management with typed Pydantic outputs |
+| **AI Models (Dream Team)** | Anthropic Claude 4.5 & OpenAI GPT-4o | Specialized LLMs for software architecture, coding, UI, and QA |
+| **Web Interface** | [Gradio 5+](https://gradio.app) | Enterprise UI with streaming agent logs, CodeMirror editors, and custom CSS |
+| **Package Management** | [UV](https://docs.astral.sh/uv/) / Hatchling | High-speed dependency resolution and packaging |
+| **Testing Framework** | Python `unittest` | Automated unit test generation with mocking and edge-case verification |
 
 ---
 
 ## 🛠️ The Crew
 
-The team consists of four specialized AI agents collaborating in a sequential orchestration process:
+The team consists of specialized AI agents collaborating in a sequential orchestration process:
 
 | Agent                 | Role          | Model               | Description                                                          |
 | --------------------- | ------------- | ------------------- | -------------------------------------------------------------------- |
@@ -75,13 +105,19 @@ graph TD
 
 ## 🔒 Security & Usage Limits
 
-This project follows **DevSecOps best practices** to ensure a safe environment for automated code generation:
+This project follows **DevSecOps best practices** to ensure a hardened environment for automated code generation:
 
-- **Path Sanitization**: All user-provided module and class names are sanitized using strict regex and `os.path.basename` to prevent directory traversal attacks.
-- **Agent Sandbox Policy**: All agents have `allow_code_execution=False` enforced by default. The system produces code but never executes it on the host environment.
-- **Rate Limiting**: 15 full generation runs per IP address to protect against API abuse.
-- **Concurrency Control**: A FIFO queuing system ensures stable performance and prevents resource exhaustion.
-- **Environment Isolation**: No sensitive credentials are ever exposed or stored within the generated project structure.
+- **Authentication & Access Control**: Optional HTTP Basic Auth via `GRADIO_AUTH_USER` and `GRADIO_AUTH_PASSWORD` for protected deployments.
+- **Path & Input Sanitization**: All user-provided module and class names are sanitized using strict regex and `os.path.basename` to prevent directory traversal attacks.
+- **Prompt Injection Defense**: User requirement specifications are strictly isolated inside `<user_requirements>` boundary tags with system constraints.
+- **Input Character Guardrails**: Maximum 3,500 characters per requirement prompt to prevent context exhaustion and token burning.
+- **Agent Sandbox Policy**: All agents have `allow_code_execution=False` enforced by default. The system produces code but never executes arbitrary code on the host environment.
+- **Sliding Window Rate Limiting**: 15 requests per 1-hour window per IP address with automatic TTL timestamp pruning.
+- **Daily Global Circuit Breaker**: Configurable daily global quota ceiling (`MAX_GLOBAL_DAILY_RUNS`, default 100) to protect OpenRouter API credits.
+- **Instant Showcase Mode**: 1-click instant preview of pre-generated full-stack projects without API delays or token consumption.
+- **Concurrency Control**: A FIFO queuing system ensures stable performance and prevents server exhaustion.
+- **Environment Isolation**: No sensitive credentials or API tokens are ever exposed to the frontend or stored within generated project artifacts.
+
 
 ---
 
@@ -100,6 +136,12 @@ This project follows **DevSecOps best practices** to ensure a safe environment f
    LEAD_MODEL=openrouter/anthropic/claude-opus-4.5
    ENGINEER_MODEL=openrouter/anthropic/claude-sonnet-4.5
    WRITER_MODEL=openrouter/openai/gpt-4o
+
+   # Optional: Web UI Authentication & Networking
+   GRADIO_AUTH_USER=admin
+   GRADIO_AUTH_PASSWORD=your_secure_password
+   GRADIO_SERVER_NAME=127.0.0.1
+   GRADIO_SERVER_PORT=7860
    ```
 4. **Run Web UI**:
    ```bash
