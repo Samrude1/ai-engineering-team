@@ -99,6 +99,70 @@ div[class*="block"] {
 
 .prose th { background-color: #f8fafc !important; }
 
+/* Force white backgrounds for gr.Examples / Dataset table / Presets */
+.gradio-container .dataset,
+.gradio-container [data-testid="dataset"],
+.gradio-container .gallery,
+.gradio-container .gallery-item,
+.gradio-container button.gallery-item,
+.gradio-container .dataset-item,
+.gradio-container .dataset-table,
+.gradio-container .table-wrap,
+.gradio-container table,
+.gradio-container thead,
+.gradio-container tbody,
+.gradio-container tr,
+.gradio-container td,
+.gradio-container th,
+.gradio-container .table,
+.gradio-container .table tr,
+.gradio-container .table td,
+.gradio-container .table th,
+div[class*="table"],
+div[class*="dataset"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.gradio-container .dataset *,
+.gradio-container [data-testid="dataset"] *,
+.gradio-container table *,
+.gradio-container tr td *,
+.gradio-container .table td * {
+    background-color: transparent !important;
+    color: #1e293b !important;
+}
+
+.gradio-container tr:hover,
+.gradio-container tr:hover td,
+.gradio-container td:hover,
+.gradio-container button.gallery-item:hover,
+.gradio-container .dataset-item:hover,
+.gradio-container .table tr:hover {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+.gradio-container th,
+.gradio-container thead th,
+.gradio-container .table th {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+.gradio-container .dataset tr td,
+.gradio-container table tr td {
+    padding: 10px !important;
+    font-size: 0.88rem !important;
+    line-height: 1.4 !important;
+}
+
 .file-preview, .file-wrap, [data-testid="file-upload"], .download {
     background-color: #111111 !important;
     color: #ffffff !important;
@@ -122,6 +186,11 @@ div[class*="block"] {
     --border-color-secondary: #cbd5e1 !important;
     --code-background-fill: #ffffff !important;
     --panel-background-fill: #ffffff !important;
+    --table-odd-background: #ffffff !important;
+    --table-even-background: #ffffff !important;
+    --table-row-focus: #f8fafc !important;
+    --table-border-color: #e2e8f0 !important;
+    --table-text-color: #0f172a !important;
     color-scheme: light !important;
 }
 
