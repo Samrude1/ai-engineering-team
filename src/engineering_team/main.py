@@ -1,8 +1,8 @@
 import sys
 import warnings
 import os
+
 os.environ["CREWAI_USE_DOCKER"] = "false"
-from datetime import datetime
 
 from engineering_team.crew import EngineeringTeam
 
@@ -29,16 +29,59 @@ class_name = "Account"
 
 def run():
     """
-    Run the research crew.
+    Run the engineering team crew.
     """
     inputs = {
         'requirements': requirements,
         'module_name': module_name,
         'class_name': class_name
     }
+    return EngineeringTeam().crew().kickoff(inputs=inputs)
 
-    # Create and run the crew
-    result = EngineeringTeam().crew().kickoff(inputs=inputs)
+
+def train():
+    """
+    Train the crew for a given number of iterations.
+    """
+    inputs = {
+        'requirements': requirements,
+        'module_name': module_name,
+        'class_name': class_name
+    }
+    try:
+        n_iterations = int(sys.argv[1]) if len(sys.argv) > 1 else 2
+        filename = sys.argv[2] if len(sys.argv) > 2 else "trained_agents.pkl"
+        EngineeringTeam().crew().train(n_iterations=n_iterations, filename=filename, inputs=inputs)
+    except Exception as e:
+        raise Exception(f"An error occurred while training the crew: {e}")
+
+
+def replay():
+    """
+    Replay the crew execution from a specific task.
+    """
+    try:
+        task_id = sys.argv[1] if len(sys.argv) > 1 else ""
+        EngineeringTeam().crew().replay(task_id=task_id)
+    except Exception as e:
+        raise Exception(f"An error occurred while replaying the crew: {e}")
+
+
+def test():
+    """
+    Test the crew execution and returns the results.
+    """
+    inputs = {
+        'requirements': requirements,
+        'module_name': module_name,
+        'class_name': class_name
+    }
+    try:
+        n_iterations = int(sys.argv[1]) if len(sys.argv) > 1 else 2
+        eval_llm = sys.argv[2] if len(sys.argv) > 2 else "gpt-4o"
+        EngineeringTeam().crew().test(n_iterations=n_iterations, eval_llm=eval_llm, inputs=inputs)
+    except Exception as e:
+        raise Exception(f"An error occurred while testing the crew: {e}")
 
 
 if __name__ == "__main__":

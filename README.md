@@ -50,8 +50,7 @@ engineering_team/
 │       ├── config/
 │       │   ├── agents.yaml     # Agent roles, goals, and backstories
 │       │   └── tasks.yaml      # Sequential task definitions & contracts
-│       └── tools/
-│           └── custom_tool.py  # Extensible custom tools for crew agents
+│       └── tools/              # Extensible custom tools for crew agents
 ├── .agents/                    # Architecture, context, workflows, & agent rules
 ├── output/                     # Ephemeral workspace directories for runs
 ├── pyproject.toml              # UV / Hatchling project metadata & dependencies

@@ -10,7 +10,14 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 from engineering_team.crew import EngineeringTeam
-from engineering_team.utils import create_project_zip, cleanup_old_sessions, sanitize_all_outputs, strip_markdown_from_python
+from engineering_team.utils import (
+    create_project_zip,
+    cleanup_old_sessions,
+    sanitize_all_outputs,
+    safe_read_file,
+    resolve_task_target,
+    save_task_artifact
+)
 
 # Rate Limiting Tracker (Sliding Window: 15 requests per 1 hour window)
 IP_USAGE = {}
@@ -43,10 +50,11 @@ TASK_LOG_MAP = {
     "code_task": "💻 Engineering core backend logic...",
     "frontend_task": "📱 Building Gradio demonstration interface...",
     "test_task": "🧪 Writing comprehensive unit tests...",
-    "documentation_task": "📖 Generating professional project documentation..."
+    "documentation_task": "📖 Generating professional project documentation...",
+    "requirements_task": "📦 Generating requirements.txt dependency manifest..."
 }
 
-# Custom CSS for the Professional Minimalist 'Zinc' Theme (Matching Sidekick)
+# Custom CSS for the Professional Minimalist 'Zinc' Theme
 custom_css = """
 body {
     margin: 0 !important;
@@ -194,7 +202,7 @@ div[class*="dataset"] {
     color-scheme: light !important;
 }
 
-/* Bruteforce for the specific Code header and File boxes */
+/* Specific Code header and File boxes */
 .gradio-container .label, 
 .gradio-container span[class*="label"],
 .gradio-container .file-preview,
@@ -222,14 +230,12 @@ h1 {
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
-    /* Force ALL rows to stack on mobile */
     .gradio-container .row, 
     .gradio-container .gap,
     .gradio-container [class*="row-"] {
         flex-direction: column !important;
         flex-wrap: wrap !important;
     }
-    /* Ensure columns and form elements take full width */
     .gradio-container .column,
     .gradio-container .form,
     .gradio-container [class*="column-"],
@@ -253,10 +259,10 @@ h2, h3 {
 }
 
 p, li, th, td, label, span {
-    color: #374151 !important; /* Slate 700 */
+    color: #374151 !important;
 }
 
-/* Inputs (Exclude Checkboxes from global overrides) */
+/* Inputs */
 input:not([type="checkbox"]), textarea {
     background-color: #ffffff !important;
     border: 1px solid #d4d4d4 !important;
@@ -345,7 +351,6 @@ div.tabs button.selected {
     background: transparent !important;
 }
 
-/* Fix for right-side data cutoff */
 .tabitem {
     background: #ffffff !important;
     border: 1px solid #e5e7eb !important;
@@ -361,8 +366,8 @@ div.tabs button.selected {
         padding: 10px !important;
     }
 }
-
 """
+
 
 def solve_requirements_streaming(requirements, module_name, class_name, lead_model_choice, engineer_model_choice, request: gr.Request):
     client_ip = request.client.host if request else "unknown"
@@ -421,95 +426,19 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         result_container["task_index"] += 1
         idx = result_container["task_index"]
         
-        target_file = None
-        current_task_type = None
-        
-        description = (task_output.description.lower() if hasattr(task_output, 'description') else "").strip()
-        
-        # Robust Mapping by Description
-        if "blueprint" in description or "design" in description:
-            current_task_type = "design_task"
-            target_file = os.path.join(output_dir, f"{module_name}_design.md")
-        elif "unit test" in description or "test_task" in description:
-            current_task_type = "test_task"
-            target_file = os.path.join(output_dir, f"test_{module_name}")
-        elif "gradio ui" in description:
-            current_task_type = "frontend_task"
-            target_file = os.path.join(output_dir, "app.py")
-        elif "readme.md" in description or "documentation" in description:
-            current_task_type = "documentation_task"
-            target_file = os.path.join(output_dir, "README.md")
-        elif "requirements.txt" in description:
-            current_task_type = "requirements_task"
-            target_file = os.path.join(output_dir, "requirements.txt")
-        elif "implement the logic" in description or ("logic" in description and "gradio" not in description):
-            current_task_type = "code_task"
-            target_file = os.path.join(output_dir, module_name)
-        else:
-            # Fallback to index if description matching fails
-            if idx == 1:
-                current_task_type = "design_task"
-                target_file = os.path.join(output_dir, f"{module_name}_design.md")
-            elif idx == 2:
-                current_task_type = "code_task"
-                target_file = os.path.join(output_dir, module_name)
-            elif idx == 3:
-                current_task_type = "frontend_task"
-                target_file = os.path.join(output_dir, "app.py")
-            elif idx == 4:
-                current_task_type = "test_task"
-                target_file = os.path.join(output_dir, f"test_{module_name}")
-            elif idx == 5:
-                current_task_type = "documentation_task"
-                target_file = os.path.join(output_dir, "README.md")
-            elif idx == 6:
-                current_task_type = "requirements_task"
-                target_file = os.path.join(output_dir, "requirements.txt")
+        description = (task_output.description if hasattr(task_output, 'description') else "").strip()
+        task_type, target_file = resolve_task_target(description, idx, output_dir, module_name)
 
         if target_file:
             try:
-                # Prioritize 'code' field if in Pydantic, otherwise use raw
-                if task_output.pydantic and hasattr(task_output.pydantic, 'code'):
-                    content = task_output.pydantic.code
-                else:
-                    content = str(task_output.raw)
-                
-                if current_task_type == "requirements_task":
-                    # Force modern Gradio if agent uses an old version or omits it
-                    if "gradio" not in content.lower() or "gradio==" in content.lower() or "gradio<" in content.lower():
-                        # Strip any existing gradio line and add the modern one
-                        content = "\n".join([l for l in content.split("\n") if "gradio" not in l.lower()])
-                        content += "\ngradio>=5.0.0"
-                    if "requests" not in content.lower(): content += "\nrequests"
-                    
-                    # Remove standard libraries that AI often incorrectly includes
-                    std_libs = getattr(sys, 'stdlib_module_names', set(["math", "os", "sys", "json", "datetime", "random", "re", "time", "unittest", "logging"]))
-                    content = "\n".join([l for l in content.split("\n") if l.strip().split("=")[0].split(">")[0].split("<")[0].lower() not in std_libs])
-                
-                with open(target_file, "w", encoding="utf-8") as f:
-                    f.write(content)
-                
-                if target_file.endswith('.py'):
-                    # Fix common AI deprecation mistakes
-                    content = content.replace("readonly=True", "interactive=False")
-                    content = content.replace("readonly = True", "interactive=False")
-                    
-                    strip_markdown_from_python(target_file)
-                    # Brute-force: Remove any Gradio leakage from backend modules
-                    if current_task_type == "code_task":
-                        with open(target_file, 'r', encoding='utf-8') as f:
-                            lines = f.readlines()
-                        clean_lines = [l for l in lines if not any(bad in l.lower() for bad in ["import gradio", "from gradio", "gr.", ".launch("])]
-                        with open(target_file, 'w', encoding='utf-8') as f:
-                            f.writelines(clean_lines)
-                
+                save_task_artifact(task_output, task_type, target_file)
                 msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
-                if current_task_type == "documentation_task":
+                if task_type == "documentation_task":
                     msg += "\nFinishedSuccessfully"
             except Exception as e:
                 msg = f"[{timestamp}] ⚠️ Error saving {os.path.basename(target_file)}: {str(e)}"
         else:
-            summary = TASK_LOG_MAP.get(current_task_type, f"Task Completed: {task_output.description[:40]}...")
+            summary = TASK_LOG_MAP.get(task_type, f"Task Completed: {description[:40]}...")
             msg = f"[{timestamp}] ✅ {summary}"
         
         log_queue.put(msg)
@@ -517,7 +446,8 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     def log_step(step_output):
         timestamp = datetime.now().strftime("%H:%M:%S")
         msg = f"[{timestamp}] ⚙️ Agent thinking..."
-        if hasattr(step_output, 'agent'): msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
+        if hasattr(step_output, 'agent'):
+            msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
@@ -538,17 +468,22 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     
     def run_crew():
         try:
-            crew_obj = EngineeringTeam(task_callback=log_task, step_callback=log_step, lead_model=lead_model_choice, engineer_model=engineer_model_choice).crew()
+            crew_obj = EngineeringTeam(
+                task_callback=log_task,
+                step_callback=log_step,
+                lead_model=lead_model_choice,
+                engineer_model=engineer_model_choice
+            ).crew()
             result_container["data"] = crew_obj.kickoff(inputs=inputs)
             result_container["success"] = True
         except Exception as e:
             raw_err = str(e)
-            # Prevent leaking sensitive internal traces, keys, or endpoints
             if any(k in raw_err.lower() for k in ["api_key", "secret", "token", "password", "authorization"]):
                 result_container["error"] = "Authentication or credential error encountered during execution."
             else:
                 result_container["error"] = raw_err[:250]
-        finally: result_container["done"] = True
+        finally:
+            result_container["done"] = True
 
     thread = threading.Thread(target=run_crew)
     thread.start()
@@ -558,10 +493,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
             while True:
                 new_log = log_queue.get_nowait()
                 current_logs += new_log + "\n"
-        except queue.Empty: pass
+        except queue.Empty:
+            pass
         
         main_status = "Engineering Team is working..."
-        if "FinishedSuccessfully" in current_logs: main_status = "Finalizing output..."
+        if "FinishedSuccessfully" in current_logs:
+            main_status = "Finalizing output..."
         
         yield (main_status, "", "", "", "", "", current_logs, gr.update(visible=False))
         time.sleep(0.5)
@@ -569,15 +506,14 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     if result_container["success"]:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
         sanitize_all_outputs(output_dir, module_name)
-        def read_file(path): return open(path, 'r', encoding='utf-8').read() if os.path.exists(path) else ""
         zip_path = create_project_zip(output_dir, zip_name_prefix=module_name.split('.')[0])
         yield (
             "✅ All projects generated!",
-            read_file(f"{output_dir}/{module_name}_design.md"),
-            read_file(f"{output_dir}/{module_name}"),
-            read_file(f"{output_dir}/app.py"),
-            read_file(f"{output_dir}/test_{module_name}"),
-            read_file(f"{output_dir}/README.md"),
+            safe_read_file(f"{output_dir}/{module_name}_design.md"),
+            safe_read_file(f"{output_dir}/{module_name}"),
+            safe_read_file(f"{output_dir}/app.py"),
+            safe_read_file(f"{output_dir}/test_{module_name}"),
+            safe_read_file(f"{output_dir}/README.md"),
             current_logs,
             gr.update(value=zip_path, visible=True)
         )
@@ -585,12 +521,10 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
         yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
 
+
 def load_instant_sample_preview():
     """Instantly loads pre-generated showcase project without consuming API credits or waiting."""
     showcase_dir = os.path.join(os.path.dirname(__file__), "sample_showcase")
-    def read_f(name):
-        p = os.path.join(showcase_dir, name)
-        return open(p, "r", encoding="utf-8").read() if os.path.exists(p) else ""
     
     zip_path = create_project_zip(showcase_dir, zip_name_prefix="sample_trading_platform")
     logs = (
@@ -604,14 +538,15 @@ def load_instant_sample_preview():
     )
     return (
         "⚡ Instant Sample Showcase Loaded (Trading Platform)",
-        read_f("accounts_design.md"),
-        read_f("accounts.py"),
-        read_f("app.py"),
-        read_f("test_accounts.py"),
-        read_f("README.md"),
+        safe_read_file(os.path.join(showcase_dir, "accounts_design.md")),
+        safe_read_file(os.path.join(showcase_dir, "accounts.py")),
+        safe_read_file(os.path.join(showcase_dir, "app.py")),
+        safe_read_file(os.path.join(showcase_dir, "test_accounts.py")),
+        safe_read_file(os.path.join(showcase_dir, "README.md")),
         logs,
         gr.update(value=zip_path, visible=True)
     )
+
 
 # Build UI
 with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "sans-serif"]), css=custom_css, title="Engineering Team | Enterprise") as demo:
@@ -689,7 +624,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font
                 label="Click any preset below to populate requirements:"
             )
             
-        with gr.Column(scale=7, min_width=300): # Larger scale for output content
+        with gr.Column(scale=7, min_width=300):
             with gr.Tabs():
                 with gr.TabItem("📋 Architecture"):
                     design_out = gr.Markdown("Waiting...", elem_classes=["tabitem"])
@@ -729,5 +664,3 @@ if __name__ == "__main__":
         server_port=server_port,
         auth=auth_config
     )
-
-

@@ -9,7 +9,7 @@ engineering_lead:
     You are an experienced architect who values simplicity and clarity. 
     You provide straightforward designs that are easy to implement.
     In your blueprints, always emphasize the use of persistent counters or UUIDs for ID assignment—never rely on list length.
-  llm: openrouter/openai/gpt-5.5
+  llm: openrouter/anthropic/claude-opus-4.5
   max_tokens: 2000
 
 backend_engineer:
@@ -25,7 +25,7 @@ backend_engineer:
     - LOGIC CRITICAL: Never use list length (len(...) + 1) for unique IDs if items can be deleted. Use a persistent counter (self.next_id).
     IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
     encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
-  llm: openrouter/anthropic/claude-sonnet-4.6
+  llm: openrouter/anthropic/claude-sonnet-4.5
   max_tokens: 2000
 
 frontend_engineer:
@@ -44,7 +44,7 @@ frontend_engineer:
     - PRODUCT THINKING: Use professional and engaging terminology (e.g., "Deploy Mission" instead of "Add Task").
     IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
     encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
-  llm: openrouter/anthropic/claude-sonnet-4.6
+  llm: openrouter/anthropic/claude-sonnet-4.5
   max_tokens: 2000
 
 test_engineer:
@@ -59,7 +59,7 @@ test_engineer:
     effective test cases.
     IMPORTANT: Do NOT include shebang lines like '#!/usr/bin/env python' or 
     encoding declarations like '# -*- coding: utf-8 -*-' at the top of your files.
-  llm: openrouter/anthropic/claude-sonnet-4.6
+  llm: openrouter/anthropic/claude-sonnet-4.5
   max_tokens: 2000
 
 documentation_engineer:
@@ -72,5 +72,5 @@ documentation_engineer:
   backstory: >
     You help users get started quickly with clear instructions and clean 
     project metadata.
-  llm: openrouter/anthropic/claude-sonnet-4.6
+  llm: openrouter/openai/gpt-4o
   max_tokens: 2000
