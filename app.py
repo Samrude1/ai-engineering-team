@@ -371,11 +371,228 @@ div.tabs button.selected {
         padding: 10px !important;
     }
 }
+
+/* Animated AI Agent Status & Working Indicator */
+@keyframes spin-smooth {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes live-ping {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.45; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmer-sweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.agent-status-card {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 12px 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.agent-status-card.ready {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.agent-status-card.running {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    border: 1.5px solid #3b82f6;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+}
+
+.agent-status-card.success {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border: 1.5px solid #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+}
+
+.agent-status-card.error {
+    background: #fff5f5;
+    border: 1.5px solid #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+}
+
+.agent-status-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.agent-spinner {
+    width: 26px;
+    height: 26px;
+    border: 3px solid rgba(59, 130, 246, 0.2);
+    border-top: 3px solid #2563eb;
+    border-right: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin-smooth 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+.status-icon-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.status-icon-circle.neutral {
+    background: #f1f5f9;
+}
+
+.status-icon-circle.success {
+    background: #dcfce7;
+}
+
+.status-icon-circle.error {
+    background: #fee2e2;
+}
+
+.agent-status-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.agent-status-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.agent-status-subtitle {
+    font-size: 0.84rem;
+    color: #475569;
+    margin-top: 3px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.4;
+}
+
+.live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #2563eb;
+    border-radius: 50%;
+    animation: live-ping 1.2s ease-in-out infinite;
+}
+
+.timer-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.agent-shimmer-bar {
+    height: 4px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #e2e8f0 0%, #3b82f6 50%, #e2e8f0 100%);
+    background-size: 200% 100%;
+    animation: shimmer-sweep 1.8s infinite linear;
+}
 """
+
+
+def render_status_html(status_type: str, title: str, subtitle: str = "", timer_info: str = "") -> str:
+    """Renders a sleek, responsive HTML card with animations for the agent activity state."""
+    if status_type == "ready":
+        return f"""
+        <div class="agent-status-card ready">
+            <div class="agent-status-header">
+                <div class="status-icon-circle neutral">⚡</div>
+                <div class="agent-status-content">
+                    <div class="agent-status-title">{title}</div>
+                    <div class="agent-status-subtitle">{subtitle}</div>
+                </div>
+            </div>
+        </div>
+        """
+    elif status_type == "running":
+        timer_badge = f'<span class="timer-badge">⏱️ {timer_info}</span>' if timer_info else ''
+        return f"""
+        <div class="agent-status-card running">
+            <div class="agent-status-header">
+                <div class="agent-spinner"></div>
+                <div class="agent-status-content">
+                    <div class="agent-status-title">
+                        <span>{title}</span>
+                        <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+                        {timer_badge}
+                    </div>
+                    <div class="agent-status-subtitle">{subtitle}</div>
+                </div>
+            </div>
+            <div class="agent-shimmer-bar"></div>
+        </div>
+        """
+    elif status_type == "success":
+        return f"""
+        <div class="agent-status-card success">
+            <div class="agent-status-header">
+                <div class="status-icon-circle success">✅</div>
+                <div class="agent-status-content">
+                    <div class="agent-status-title">{title}</div>
+                    <div class="agent-status-subtitle">{subtitle}</div>
+                </div>
+            </div>
+        </div>
+        """
+    else:  # error
+        return f"""
+        <div class="agent-status-card error">
+            <div class="agent-status-header">
+                <div class="status-icon-circle error">❌</div>
+                <div class="agent-status-content">
+                    <div class="agent-status-title" style="color: #b91c1c;">{title}</div>
+                    <div class="agent-status-subtitle" style="color: #7f1d1d;">{subtitle}</div>
+                </div>
+            </div>
+        </div>
+        """
 
 
 def solve_requirements_streaming(requirements, module_name, class_name, lead_model_choice, engineer_model_choice, request: gr.Request):
     client_ip = request.client.host if request else "unknown"
+    start_time = time.time()
     
     # 1. Global Daily Circuit Breaker Check
     today_key = datetime.now().strftime("%Y-%m-%d")
@@ -384,12 +601,22 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         GLOBAL_DAILY_TRACKER["count"] = 0
     
     if GLOBAL_DAILY_TRACKER["count"] >= MAX_GLOBAL_DAILY_RUNS:
-        yield ("⚠️ Daily global demo quota reached.", "", "", "", "", "", "System Notice: The daily public demo quota has been reached to protect API resources. You can still use the '⚡ Instant Sample Output' button above to inspect pre-generated artifacts!", gr.update(visible=False))
+        yield (
+            render_status_html("error", "Daily Quota Reached", "The daily global demo quota has been reached to protect API resources. You can still use '⚡ Instant Preview'!"),
+            "", "", "", "", "",
+            "System Notice: The daily public demo quota has been reached to protect API resources. You can still use the '⚡ Instant Preview' button above to inspect pre-generated artifacts!",
+            gr.update(visible=False)
+        )
         return
 
     # 2. Character Length Safeguard (Prevent context exhaustion)
     if len(requirements) > MAX_REQUIREMENTS_CHARS:
-        yield (f"⚠️ Requirements exceed maximum length ({len(requirements)}/{MAX_REQUIREMENTS_CHARS} chars).", "", "", "", "", "", f"Input Error: Please condense your requirements under {MAX_REQUIREMENTS_CHARS} characters.", gr.update(visible=False))
+        yield (
+            render_status_html("error", "Requirements Exceed Limit", f"Requirements exceed maximum length ({len(requirements)}/{MAX_REQUIREMENTS_CHARS} chars). Please condense."),
+            "", "", "", "", "",
+            f"Input Error: Please condense your requirements under {MAX_REQUIREMENTS_CHARS} characters.",
+            gr.update(visible=False)
+        )
         return
 
     # 3. Clean expired entries and enforce sliding window rate limit
@@ -399,11 +626,21 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     ip_history = [t for t in ip_history if now - t < RATE_LIMIT_WINDOW_SECONDS]
     
     if len(ip_history) >= MAX_REQUESTS_PER_WINDOW:
-        yield ("⚠️ Rate limit reached (max 15 requests/hr).", "", "", "", "", "", "System Notice: Rate limit exceeded for this IP. Please try again later, or use '⚡ Instant Sample Output'.", gr.update(visible=False))
+        yield (
+            render_status_html("error", "Rate Limit Reached", "Rate limit exceeded for this IP (max 15 requests/hour). Please try again later or use '⚡ Instant Preview'."),
+            "", "", "", "", "",
+            "System Notice: Rate limit exceeded for this IP. Please try again later, or use '⚡ Instant Preview'.",
+            gr.update(visible=False)
+        )
         return
     
     if not requirements.strip():
-        yield ("⚠️ Please enter your requirements.", "", "", "", "", "", "Input Error: Empty requirements.", gr.update(visible=False))
+        yield (
+            render_status_html("error", "Requirements Required", "Please enter product specifications or choose one of the quick presets below."),
+            "", "", "", "", "",
+            "Input Error: Empty requirements.",
+            gr.update(visible=False)
+        )
         return
 
     # Security: Sanitize inputs to prevent path traversal and injection
@@ -424,7 +661,15 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     output_dir = os.path.join('output', session_id)
     os.makedirs(output_dir, exist_ok=True)
     
-    result_container = {"success": False, "data": None, "error": None, "done": False, "task_index": 0}
+    result_container = {
+        "success": False,
+        "data": None,
+        "error": None,
+        "done": False,
+        "task_index": 0,
+        "current_agent": "Lead Architect",
+        "current_activity": "Architecting the system blueprint..."
+    }
     
     def log_task(task_output):
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -437,7 +682,9 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         if target_file:
             try:
                 save_task_artifact(task_output, task_type, target_file)
-                msg = f"[{timestamp}] 💾 File Saved: {os.path.basename(target_file)}"
+                file_name = os.path.basename(target_file)
+                msg = f"[{timestamp}] 💾 File Saved: {file_name}"
+                result_container["current_activity"] = f"Saved {file_name}. Moving to next phase..."
                 if task_type == "documentation_task":
                     msg += "\nFinishedSuccessfully"
             except Exception as e:
@@ -445,6 +692,7 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         else:
             summary = TASK_LOG_MAP.get(task_type, f"Task Completed: {description[:40]}...")
             msg = f"[{timestamp}] ✅ {summary}"
+            result_container["current_activity"] = summary
         
         log_queue.put(msg)
         
@@ -452,7 +700,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         timestamp = datetime.now().strftime("%H:%M:%S")
         msg = f"[{timestamp}] ⚙️ Agent thinking..."
         if hasattr(step_output, 'agent'):
-            msg = f"[{timestamp}] 🤖 {step_output.agent} is active..."
+            agent_name = str(step_output.agent)
+            msg = f"[{timestamp}] 🤖 {agent_name} is active..."
+            result_container["current_agent"] = agent_name
+            result_container["current_activity"] = f"{agent_name} is writing code & reasoning..."
+        else:
+            result_container["current_activity"] = "AI Agent is reasoning and generating code..."
         log_queue.put(msg)
 
     today_str = datetime.now().strftime("%B %d, %Y")
@@ -469,7 +722,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
     
     inputs = {'requirements': enriched_requirements, 'module_name': module_name, 'class_name': class_name}
     current_logs = f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Initializing Engineering Team...\n"
-    yield ("Team is starting...", "", "", "", "", "", current_logs, gr.update(visible=False))
+    yield (
+        render_status_html("running", "Engineering Team Starting", "Assembling AI agents and architecting blueprint...", "0s"),
+        "", "", "", "", "",
+        current_logs,
+        gr.update(visible=False)
+    )
     
     def run_crew():
         try:
@@ -501,19 +759,26 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         except queue.Empty:
             pass
         
-        main_status = "Engineering Team is working..."
+        elapsed_sec = int(time.time() - start_time)
+        activity = result_container.get("current_activity", "Collaborating on engineering artifacts...")
         if "FinishedSuccessfully" in current_logs:
-            main_status = "Finalizing output..."
+            activity = "Finalizing outputs and compiling ZIP archive..."
         
-        yield (main_status, "", "", "", "", "", current_logs, gr.update(visible=False))
+        yield (
+            render_status_html("running", "AI Agents Collaborating", activity, f"{elapsed_sec}s"),
+            "", "", "", "", "",
+            current_logs,
+            gr.update(visible=False)
+        )
         time.sleep(0.5)
 
+    total_sec = int(time.time() - start_time)
     if result_container["success"]:
-        current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully!\n"
+        current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Engineering Team finished successfully in {total_sec}s!\n"
         sanitize_all_outputs(output_dir, module_name)
         zip_path = create_project_zip(output_dir, zip_name_prefix=module_name.split('.')[0])
         yield (
-            "✅ All projects generated!",
+            render_status_html("success", "Engineering Complete!", f"All project artifacts generated successfully in {total_sec}s. Ready for inspection or ZIP download below."),
             safe_read_file(f"{output_dir}/{module_name}_design.md"),
             safe_read_file(f"{output_dir}/{module_name}"),
             safe_read_file(f"{output_dir}/app.py"),
@@ -524,7 +789,12 @@ def solve_requirements_streaming(requirements, module_name, class_name, lead_mod
         )
     else:
         current_logs += f"[{datetime.now().strftime('%H:%M:%S')}] ❌ Error: {result_container['error']}\n"
-        yield ("❌ Error occurred.", "", "", "", "", "", current_logs, gr.update(visible=False))
+        yield (
+            render_status_html("error", "Execution Stopped", str(result_container['error'] or "An error occurred during agent execution.")),
+            "", "", "", "", "",
+            current_logs,
+            gr.update(visible=False)
+        )
 
 
 def load_instant_sample_preview():
@@ -542,7 +812,7 @@ def load_instant_sample_preview():
         f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Browse the tabs above to inspect all generated artifacts immediately."
     )
     return (
-        "⚡ Instant Sample Showcase Loaded (Trading Platform)",
+        render_status_html("success", "⚡ Instant Sample Showcase Loaded (Trading Platform)", "Browse the tabs on the right to inspect architecture, backend logic, Gradio UI, and unit tests."),
         safe_read_file(os.path.join(showcase_dir, "accounts_design.md")),
         safe_read_file(os.path.join(showcase_dir, "accounts.py")),
         safe_read_file(os.path.join(showcase_dir, "app.py")),
@@ -597,7 +867,7 @@ with gr.Blocks(theme=gr.themes.Base(primary_hue="zinc", neutral_hue="zinc", font
                 run_btn = gr.Button("Execute Engineering Task", variant="primary", scale=2)
                 sample_btn = gr.Button("⚡ Instant Preview", variant="secondary", scale=1)
             
-            status = gr.Markdown("Ready to engineer.")
+            status = gr.HTML(render_status_html("ready", "Ready to Engineer", "Enter requirements and press Execute Engineering Task"), elem_id="status-container")
             download_btn = gr.File(label="⬇️ Download Output (ZIP)", visible=False)
             
             terminal_log = gr.TextArea(

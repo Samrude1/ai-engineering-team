@@ -14,6 +14,7 @@ code_task:
     - Focus on the {class_name} functionality.
     - LOGIC: Use a self.next_id counter for unique IDs; do NOT use list length.
     - Strictly logic only (no Gradio/UI).
+    - Provide complete, functional Python code directly.
   expected_output: >
     A functional Python file ({module_name}).
   agent: backend_engineer
@@ -28,6 +29,7 @@ frontend_task:
     - API: Use 'interactive=False' instead of 'readonly=True'.
     - VISUALS: Implement a "Premium" look with custom CSS (gradients, shadows, professional fonts).
     - UX: Use engaging, high-level terminology for labels and buttons.
+    - Provide the complete runnable code directly.
   expected_output: >
     A runnable app.py file.
   agent: frontend_engineer
@@ -39,6 +41,7 @@ test_task:
     Write unit tests for {module_name}.
     - Test the primary methods of {class_name}.
     - Ensure basic edge cases are covered.
+    - Provide complete runnable test code directly.
   expected_output: >
     A runnable test file.
   agent: test_engineer
@@ -59,6 +62,7 @@ documentation_task:
 requirements_task:
   description: >
     Create a requirements.txt file with only external dependencies.
+    - Output only external package requirements, one per line.
   expected_output: >
     A clean requirements.txt file.
   agent: documentation_engineer

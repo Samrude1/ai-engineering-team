@@ -25,15 +25,15 @@ class EngineeringTeam():
         # Using 4000 tokens as a safe upper bound for complex engineering tasks
         self.lead_llm = LLM(
             model=lead_model or os.getenv("LEAD_MODEL", "openrouter/anthropic/claude-opus-4.5"),
-            max_tokens=2000
+            max_tokens=4000
         )
         self.engineer_llm = LLM(
             model=engineer_model or os.getenv("ENGINEER_MODEL", "openrouter/anthropic/claude-sonnet-4.5"),
-            max_tokens=2000
+            max_tokens=4000
         )
         self.writer_llm = LLM(
             model=os.getenv("WRITER_MODEL", "openrouter/openai/gpt-4o"),
-            max_tokens=2000
+            max_tokens=4000
         )
 
     @agent
@@ -94,35 +94,31 @@ class EngineeringTeam():
     @task
     def code_task(self) -> Task:
         return Task(
-            config=self.tasks_config['code_task'],
-            output_pydantic=CodeOutput
+            config=self.tasks_config['code_task']
         )
 
     @task
     def frontend_task(self) -> Task:
         return Task(
-            config=self.tasks_config['frontend_task'],
-            output_pydantic=CodeOutput
+            config=self.tasks_config['frontend_task']
         )
 
     @task
     def test_task(self) -> Task:
         return Task(
-            config=self.tasks_config['test_task'],
-            output_pydantic=CodeOutput
+            config=self.tasks_config['test_task']
         )   
 
     @task
     def documentation_task(self) -> Task:
         return Task(
-            config=self.tasks_config['documentation_task'],
+            config=self.tasks_config['documentation_task']
         )
 
     @task
     def requirements_task(self) -> Task:
         return Task(
-            config=self.tasks_config['requirements_task'],
-            output_pydantic=CodeOutput
+            config=self.tasks_config['requirements_task']
         )
 
     @crew
