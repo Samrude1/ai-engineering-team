@@ -9,11 +9,19 @@ jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://samrude1:$HF_TOKEN@huggingface.co/spaces/samrude1/EngineeringTeam main
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "HF_TOKEN secret not configured in GitHub repository secrets."
+            echo "Skipping manual push."
+            exit 0
+          fi
+          git config --global user.email "samrude@users.noreply.github.com"
+          git config --global user.name "Samrude1"
+          git push --force https://samrude1:$HF_TOKEN@huggingface.co/spaces/samrude1/EngineeringTeam main:main

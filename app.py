@@ -2,6 +2,11 @@ import uuid
 import gradio as gr
 import os
 import sys
+
+# Force line buffering so Hugging Face Spaces container logs show stdout immediately
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(line_buffering=True)
+
 import threading
 import queue
 import time
@@ -656,11 +661,13 @@ if __name__ == "__main__":
     auth_password = os.getenv("GRADIO_AUTH_PASSWORD") or os.getenv("GRADIO_AUTH_PASS")
     auth_config = (auth_user, auth_password) if (auth_user and auth_password) else None
 
-    server_name = os.getenv("GRADIO_SERVER_NAME", "127.0.0.1")
-    server_port = int(os.getenv("GRADIO_SERVER_PORT", "7860"))
+    port = int(os.environ.get("PORT", os.environ.get("GRADIO_SERVER_PORT", 7860)))
+    server_name = os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0")
 
+    print(f"Starting EngineeringTeam Gradio UI on {server_name}:{port}...", flush=True)
     demo.queue(default_concurrency_limit=2, max_size=10).launch(
         server_name=server_name,
-        server_port=server_port,
-        auth=auth_config
+        server_port=port,
+        auth=auth_config,
+        show_error=True
     )
